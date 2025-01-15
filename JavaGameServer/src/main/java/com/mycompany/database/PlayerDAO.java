@@ -13,7 +13,7 @@ import java.util.List;
  * @author ArwaKhaled
  */
 public interface PlayerDAO {
-   List<PlayerDTO> getOnlinePlyers();
+   List<PlayerDTO> getOnlinePlayers();
   void updatePlayerScore( PlayerScoreUpdateDTO playerScoreUpdate);
     
 }
