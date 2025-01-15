@@ -19,7 +19,7 @@
 -- Current Database: `JavaGame`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `JavaGame` /*!40100 DEFAULT CHARACTER SET utf8 */;
+CREATE DATABASE IF NOT EXISTS `JavaGame` /*!40100 DEFAULT CHARACTER SET utf8 */;
 
 USE `JavaGame`;
 
@@ -27,10 +27,7 @@ USE `JavaGame`;
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `user_name` varchar(25) NOT NULL,
   `password_hash` varchar(128) NOT NULL,
   `score` int(11) NOT NULL DEFAULT '0',
@@ -38,4 +35,3 @@ CREATE TABLE `users` (
   `is_available` bit(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;

@@ -4,11 +4,10 @@
  */
 package com.mycompany.database;
 
-import com.mysql.jdbc.Driver;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
+import org.mariadb.jdbc.Driver;
 /**
  *
  * @author AhmedAli
@@ -19,7 +18,7 @@ public class Database {
     
     private Database() throws SQLException {
         DriverManager.registerDriver(new Driver());
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/javagame?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "");
+        connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/JavaGame", "JavaGame", "JavaGame");
     }
     
     public static Database getInstance() throws SQLException{
