@@ -22,7 +22,7 @@ public class PlayerDAOImpl implements PlayerDAO{
     
         
     @Override
-    public List<PlayerDTO> getOnlinePlyers() {
+    public List<PlayerDTO> getOnlinePlayers() {
         List<PlayerDTO> onlinePlayers = new ArrayList<>();
         
         String query = "SELECT * FROM USERS WHRER is_online != 0"; // != may be <>
