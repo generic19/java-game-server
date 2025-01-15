@@ -8,12 +8,12 @@ package com.mycompany.database;
  *
  * @author ArwaKhaled
  */
-public class PlayerDtoImp implements PlayerDTO {
+public class PlayerDTOImpl implements PlayerDTO {
     String userName ;
     int score;
     boolean isAvailable ;
 
-    public PlayerDtoImp(String userName, int score, boolean isAvailable) {
+    public PlayerDTOImpl(String userName, int score, boolean isAvailable) {
         this.userName = userName;
         this.score = score;
         this.isAvailable = isAvailable;
