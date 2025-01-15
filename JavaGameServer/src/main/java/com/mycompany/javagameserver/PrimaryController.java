@@ -12,7 +12,7 @@ public class PrimaryController {
     @FXML
     private void switchToSecondary() throws IOException {
         try {
-            Database.getInstance();
+            Database.getInstance().getConnection();
         } catch (SQLException ex) {
             Logger.getLogger(PrimaryController.class.getName()).log(Level.SEVERE, null, ex);
         }

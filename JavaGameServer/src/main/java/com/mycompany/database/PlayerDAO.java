@@ -14,6 +14,6 @@ import java.util.List;
  */
 public interface PlayerDAO {
    List<PlayerDTO> getOnlinePlyers();
-  void updatePlayerScore( PlayerScoreUpdateDTO playerScoreUpdate);
+   void updatePlayerScore( PlayerScoreUpdateDTO playerScoreUpdate);
     
 }

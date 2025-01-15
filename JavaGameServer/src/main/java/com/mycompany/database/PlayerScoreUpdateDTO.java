@@ -10,10 +10,6 @@ package com.mycompany.database;
  */
 public interface PlayerScoreUpdateDTO {
 
-     String getUsername(); 
-   
-
-    int getScore(); 
-    
-    
+    String getUsername(); 
+    int getScore();  
 }
