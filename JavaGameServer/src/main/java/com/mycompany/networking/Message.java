@@ -4,10 +4,13 @@
  */
 package com.mycompany.networking;
 
+import java.io.Serializable;
+
 /**
  *
  * @author AhmedAli
  */
-public interface Message {
+public interface Message extends Serializable {
+    
     
 }
