@@ -28,7 +28,7 @@ public interface ClientService {
     void setIsOnline(Client client, boolean isOnline);
     void setIsInGame(Client client, boolean isInGame);
     
-    Set<OnlinePlayer> getOnline();
+    Set<OnlinePlayer> getAvailable();
     Set<OnlinePlayer> getInGame();
     
     void addPlayerUpdateListener(PlayerUpdateListener listener);

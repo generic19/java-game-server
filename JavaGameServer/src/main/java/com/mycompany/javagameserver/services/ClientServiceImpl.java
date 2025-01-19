@@ -36,7 +36,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Set<OnlinePlayer> getOnline() {
+    public Set<OnlinePlayer> getAvailable() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
