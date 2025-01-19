@@ -1,35 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.javagameserver.handling;
 
-import com.mycompany.networking.Communicator;
-import com.mycompany.networking.Message;
+import com.mycompany.javagameserver.Client;
 
 /**
  *
  * @author basel
  */
-public class BaseHandler {
-    private final Communicator communicator;
-    private BaseHandler next;
-
-    BaseHandler(Communicator communicator) {
-        this.communicator = communicator;
-    }
-
-    public BaseHandler getNext() {
-        return next;
+public final class BaseHandler implements Handler {
+    private Client client;
+    private Handler next;
+    
+    @Override
+    public void bind(Client client) {
+        this.client = client;
     }
     
+    @Override
     public void handle(Request request) {
         if (next != null) {
-            this.next.handle(request);
+            next.handle(request);
         }
     }
     
-    protected void sendMessage(Message message) {
-        communicator.sendMessage(message);
+    @Override
+    public void setNext(Handler handler) {
+        this.next = handler;
     }
 }
