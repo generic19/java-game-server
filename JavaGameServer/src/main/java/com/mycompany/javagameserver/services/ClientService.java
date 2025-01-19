@@ -38,6 +38,6 @@ public interface ClientService {
     
     @FunctionalInterface
         interface PlayerUpdateListener {
-        void onPlayerUpdate(boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame);
+        void onPlayerUpdate(String username, boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame);
     }
 }
