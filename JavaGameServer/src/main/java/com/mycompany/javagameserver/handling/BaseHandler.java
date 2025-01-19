@@ -12,7 +12,7 @@ import com.mycompany.networking.Message;
  * @author basel
  */
 public class BaseHandler {
-    private Communicator communicator;
+    private final Communicator communicator;
     private BaseHandler next;
 
     BaseHandler(Communicator communicator) {
