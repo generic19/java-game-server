@@ -11,8 +11,8 @@ import com.mycompany.javagameserver.Client;
  * @author basel
  */
 public interface Handler {
-    void bind(Client client);
     
+    void bind(Client client);
     void handle(Request request);
     void setNext(Handler handler);
 }

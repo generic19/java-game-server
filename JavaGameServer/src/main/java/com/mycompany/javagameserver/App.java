@@ -1,15 +1,13 @@
 package com.mycompany.javagameserver;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+
+import com.mycompany.database.Database;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * JavaFX App
@@ -36,6 +34,12 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
+        
+        try {
+            Database.getInstance();
+            new Server(5555).start();
+        } catch (SQLException ex) {
+            System.out.println("DB server is not connected!");
+        }
     }
-
 }

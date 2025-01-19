@@ -1,7 +1,3 @@
-/*
-* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-* Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
-*/
 package com.mycompany.javagameserver;
 
 import com.mycompany.javagameserver.services.ClientService;
@@ -17,24 +13,17 @@ public class Server {
     private final Thread thread;
         
         public Server(int port) {
-            this.thread = new Thread(() -> {
+            thread = new Thread(() -> {
                 try {
                     ServerSocket serverSocket = new ServerSocket(port);
                     
-                    while (!Thread.interrupted()) {
+                    while (true) {
                         Socket clientSocket = serverSocket.accept();
                         CommunicatorClient client = new CommunicatorClient(clientSocket);
                         
-                        try {
-                            client.start();
-                            ClientService.getService().addClient(client);
-                        } catch (IOException ex) {
-                            System.err.println("Could not start client.");
-                            ex.printStackTrace();
-                        }
+                        client.start();
+                        ClientService.getService().addClient(client);
                     }
-                    
-                    System.out.println("Stopped server.");
                 } catch (IOException ex) {
                     System.err.println("Server error occurred: " + ex.toString());
                     ex.printStackTrace();
@@ -49,6 +38,6 @@ public class Server {
         
         public void stop() {
             ClientService.getService().getClients().forEach(client -> client.stop());
-            thread.interrupt();
+            thread.stop();
         }
 }

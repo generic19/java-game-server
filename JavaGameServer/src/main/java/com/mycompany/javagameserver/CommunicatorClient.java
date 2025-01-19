@@ -1,17 +1,15 @@
-/*
-* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-* Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
-*/
 package com.mycompany.javagameserver;
 
-import com.mycompany.javagameserver.handling.BaseHandler;
+import com.mycompany.javagameserver.handling.AuthHandler;
 import com.mycompany.javagameserver.handling.Handler;
 import com.mycompany.javagameserver.handling.Request;
-import com.mycompany.networking.Communicator;
-import com.mycompany.networking.CommunicatorImpl;
 import com.mycompany.networking.Message;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,41 +17,66 @@ import java.net.Socket;
  */
 public class CommunicatorClient implements Client {
     private final Socket socket;
-    private Communicator communicator;
+    ObjectInputStream inputStream;
+    ObjectOutputStream outputStream;
+    Thread thread;
+    boolean serverOn = true;
     
     public CommunicatorClient(Socket socket) {
         this.socket = socket;
+        try {
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+        } catch (IOException ex) {
+            // TODO : release all players resources
+            System.out.println("TODO : release all players resources");
+        }
     }
     
     @Override
-    public void start() throws IllegalStateException, IOException {
-        if (communicator != null) {
-            throw new IllegalStateException("Cannot call start() on an already running Client.");
-        }
+    public void start() {
+        // AuthHandler  -->  MatchingHandler  -->  GameHandler
+        Handler authHandler = new AuthHandler();
         
-        communicator = new CommunicatorImpl(socket);
+        authHandler.bind(this);
+//        handler.setNext(matchingHandler);
         
-        Handler handler = new BaseHandler();
-        handler.bind(this);
-        
-        communicator.setListener(Message.class, ((message, hasError) -> {
-            handler.handle(new Request(message));
-        }));
+        thread = new Thread(() -> {
+            while (serverOn) {
+                
+                try {
+                    Object obj = inputStream.readObject();
+                    
+                    Message msg = (Message) obj;
+                    
+                    Request request = new Request(msg);
+                    
+                    authHandler.handle(request);                    
+                } catch (IOException ex) {
+                    // close responding to messages
+                    serverOn = false;
+                    stop();
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(CommunicatorClient.class.getName()).log(Level.SEVERE, null, ex);
+                }                
+            }
+        });
+        thread.start();
     }
     
     @Override
     public void stop() {
-        if (communicator != null) {
-            communicator.close();
+        if (thread.isAlive()) {
+            thread.stop();
         }
     }
     
     @Override
-    public void sendMessage(Message message) throws IllegalStateException {
-        if (communicator == null) {
-            throw new IllegalStateException("Cannot call sendMessage() on a stopped Client.");
+    public void sendMessage(Message message) {
+        try {
+            outputStream.writeObject(message);
+        } catch (IOException ex) {
+            // to be handled
         }
-        
-        communicator.sendMessage(message);
     }
 }

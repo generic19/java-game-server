@@ -1,7 +1,3 @@
-/*
-* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-* Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
-*/
 package com.mycompany.javagameserver.services;
 
 import com.mycompany.javagameserver.Client;
@@ -14,6 +10,7 @@ import java.util.Set;
  * @author basel
  */
 public interface ClientService {
+    
     static ClientService getService() {
         return new ClientServiceImpl();
     }
@@ -37,7 +34,7 @@ public interface ClientService {
     Client getClientByUsername(String username);
     
     @FunctionalInterface
-        interface PlayerUpdateListener {
+    interface PlayerUpdateListener {
         void onPlayerUpdate(String username, boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame);
     }
 }
