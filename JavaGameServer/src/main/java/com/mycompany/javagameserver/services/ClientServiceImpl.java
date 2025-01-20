@@ -7,7 +7,7 @@ package com.mycompany.javagameserver.services;
 import com.mycompany.javagameserver.Client;
 import com.mycompany.networking.OnlinePlayer;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 /**
  *
@@ -36,12 +36,12 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Set<OnlinePlayer> getAvailable() {
+    public List<OnlinePlayer> getAvailable() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public Set<OnlinePlayer> getInGame() {
+    public List<OnlinePlayer> getInGame() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

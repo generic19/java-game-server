@@ -4,10 +4,10 @@
  */
 package com.mycompany.database;
 
+import com.mycompany.networking.OnlinePlayer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import java.util.List;
@@ -25,7 +25,7 @@ public class PlayerDAOImpl implements PlayerDAO{
     public List<PlayerDTO> getOnlinePlayers() {
         List<PlayerDTO> onlinePlayers = new ArrayList<>();
         
-        String query = "SELECT * FROM USERS WHRER is_online != 0"; // != may be <>
+        String query = "SELECT * FROM USERS WHERE is_online != 0"; // != may be <>
         try {
            Connection connection = Database.getInstance().getConnection();
            PreparedStatement prepareStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -61,5 +61,25 @@ public class PlayerDAOImpl implements PlayerDAO{
             Logger.getLogger(PlayerDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    @Override
+    public OnlinePlayerDTO getOnlinePlayer(String userName) {
+        
+         OnlinePlayerDTO  onlinePlayerDTO  =null ;
+         
+          try {
+           Connection connection = Database.getInstance().getConnection();
+           PreparedStatement prepareStatement = connection.prepareStatement("SELECT score FROM USERS WHERE user_name = ?", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+           prepareStatement.setString(1, userName);
+           ResultSet res = prepareStatement.executeQuery();
+           int score =res.getInt("score");
+            onlinePlayerDTO = new OnlinePlayerDTOImpl(new OnlinePlayer(userName,score));
+        } catch (SQLException ex) {
+            Logger.getLogger(PlayerDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return onlinePlayerDTO;
+        
+    }
+    }
     
-}

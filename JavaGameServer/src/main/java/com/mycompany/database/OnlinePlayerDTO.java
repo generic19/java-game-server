@@ -4,16 +4,12 @@
  */
 package com.mycompany.database;
 
-import java.util.List;
+import com.mycompany.networking.OnlinePlayer;
 
 /**
  *
  * @author ArwaKhaled
  */
-public interface PlayerDAO {
-   List<PlayerDTO> getOnlinePlayers();
-  void updatePlayerScore( PlayerScoreUpdateDTO playerScoreUpdate);
-  
-  OnlinePlayerDTO  getOnlinePlayer(String userName);
-  
+public interface OnlinePlayerDTO {
+    OnlinePlayer getPlayer() ;
 }

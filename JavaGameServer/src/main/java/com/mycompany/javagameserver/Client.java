@@ -14,6 +14,9 @@ import java.io.IOException;
 public interface Client {
 
     void sendMessage(Message message) throws IllegalStateException;
+    
+    void setOpponentUserName(String userName);
+    String getOpponentUserName();
 
     void start() throws IllegalStateException, IOException;
 

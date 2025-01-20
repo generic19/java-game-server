@@ -13,14 +13,14 @@ import com.mycompany.networking.Message;
 import java.io.IOException;
 import java.net.Socket;
 
-/**
+/**                     
  *
  * @author basel
  */
 public class CommunicatorClient implements Client {
     private final Socket socket;
     private Communicator communicator;
-    
+    String opponentUserName;
     public CommunicatorClient(Socket socket) {
         this.socket = socket;
     }
@@ -55,5 +55,17 @@ public class CommunicatorClient implements Client {
         }
         
         communicator.sendMessage(message);
+    }
+
+    @Override
+    public void setOpponentUserName(String userName) {
+        opponentUserName=userName;
+        
+        
+    }
+
+    @Override
+    public String getOpponentUserName() {
+        return opponentUserName;
     }
 }

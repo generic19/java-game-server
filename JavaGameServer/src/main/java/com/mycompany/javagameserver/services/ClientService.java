@@ -7,7 +7,7 @@ package com.mycompany.javagameserver.services;
 import com.mycompany.javagameserver.Client;
 import com.mycompany.networking.OnlinePlayer;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 /**
  *
@@ -28,8 +28,8 @@ public interface ClientService {
     void setIsOnline(Client client, boolean isOnline);
     void setIsInGame(Client client, boolean isInGame);
     
-    Set<OnlinePlayer> getAvailable();
-    Set<OnlinePlayer> getInGame();
+    List<OnlinePlayer> getAvailable();
+    List<OnlinePlayer> getInGame();
     
     void addPlayerUpdateListener(PlayerUpdateListener listener);
     void removePlayerUpdateListener(PlayerUpdateListener listener);
