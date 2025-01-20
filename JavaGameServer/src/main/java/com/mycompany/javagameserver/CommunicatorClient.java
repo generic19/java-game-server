@@ -1,8 +1,6 @@
 package com.mycompany.javagameserver;
 
-import com.mycompany.javagameserver.handling.AuthHandler;
-import com.mycompany.javagameserver.handling.Handler;
-import com.mycompany.javagameserver.handling.Request;
+import com.mycompany.javagameserver.handling.*;
 import com.mycompany.networking.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -78,5 +76,10 @@ public class CommunicatorClient implements Client {
         } catch (IOException ex) {
             // to be handled
         }
+    }
+
+    @Override
+    public GameHandler getGameHandler() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
