@@ -40,6 +40,7 @@ public class App extends Application {
             new Server(5555).start();
         } catch (SQLException ex) {
             System.out.println("DB server is not connected!");
+            System.exit(0);
         }
     }
 }

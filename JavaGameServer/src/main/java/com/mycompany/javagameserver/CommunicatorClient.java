@@ -39,7 +39,7 @@ public class CommunicatorClient implements Client {
         Handler authHandler = new AuthHandler();
         
         authHandler.bind(this);
-//        handler.setNext(matchingHandler);
+//        authHandler.setNext(matchingHandler);
         
         thread = new Thread(() -> {
             while (serverOn) {
@@ -57,6 +57,7 @@ public class CommunicatorClient implements Client {
                     serverOn = false;
                     stop();
                 } catch (ClassNotFoundException ex) {
+                    serverOn = false;
                     Logger.getLogger(CommunicatorClient.class.getName()).log(Level.SEVERE, null, ex);
                 }                
             }

@@ -10,8 +10,9 @@ package com.mycompany.database;
  */
 public interface UserDTO {
     
-     String getUsername();
+    String getUsername();
  
     String getPasswordHash();
-       
+    
+    String getToken();
 }
