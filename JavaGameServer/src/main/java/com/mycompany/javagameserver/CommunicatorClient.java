@@ -79,6 +79,11 @@ public class CommunicatorClient implements Client {
     }
 
     @Override
+    public MatchingHandler getMatchingHandler() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    @Override
     public GameHandler getGameHandler() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }

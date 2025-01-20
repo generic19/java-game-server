@@ -5,6 +5,7 @@
 package com.mycompany.javagameserver;
 
 import com.mycompany.javagameserver.handling.GameHandler;
+import com.mycompany.javagameserver.handling.MatchingHandler;
 import com.mycompany.networking.Message;
 import java.io.IOException;
 
@@ -19,5 +20,6 @@ public interface Client {
 
     void stop();
     
+    MatchingHandler getMatchingHandler();
     GameHandler getGameHandler();
 }
