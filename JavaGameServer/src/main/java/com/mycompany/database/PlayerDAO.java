@@ -26,4 +26,6 @@ public interface PlayerDAO {
     void updatePlayerScore(PlayerScoreUpdateDTO playerScoreUpdate);
     
     void resetPlayersStatus();
+
+    public int getScore(String username);
 }

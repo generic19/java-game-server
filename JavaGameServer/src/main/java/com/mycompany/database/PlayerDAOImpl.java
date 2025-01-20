@@ -162,6 +162,27 @@ public class PlayerDAOImpl implements PlayerDAO {
             ex.printStackTrace();
         }
     }
+
+    @Override
+    public int getScore(String username) {
+        try {
+            Connection conn = Database.getInstance().getConnection();
+            
+            PreparedStatement stmt = conn.prepareStatement("SELECT score FROM users WHERE user_name = ?");
+            
+            stmt.setString(0, username);
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("score");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        return 0;
+    }
     
     
 }

@@ -21,7 +21,7 @@ public class ClientService {
     
     private final List<PlayerUpdateListener> listeners = new CopyOnWriteArrayList<>();
     
-    static ClientService getService() {
+    public static ClientService getService() {
         if (service == null) {
             synchronized (ClientService.class) {
                 if (service == null) {
@@ -96,15 +96,15 @@ public class ClientService {
             .toList();
     }
     
-    void addPlayerUpdateListener(PlayerUpdateListener listener) {
+    public void addPlayerUpdateListener(PlayerUpdateListener listener) {
         listeners.add(listener);
     }
     
-    void removePlayerUpdateListener(PlayerUpdateListener listener) {
+    public void removePlayerUpdateListener(PlayerUpdateListener listener) {
         listeners.remove(listener);
     }
     
-    Client getClientByUsername(String username) {
+    public Client getClientByUsername(String username) {
         return clientByUsername.getOrDefault(username, null);
     }
     

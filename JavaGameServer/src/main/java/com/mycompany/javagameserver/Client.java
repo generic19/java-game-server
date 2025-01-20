@@ -4,6 +4,7 @@
  */
 package com.mycompany.javagameserver;
 
+import com.mycompany.javagameserver.handling.GameHandler;
 import com.mycompany.networking.Message;
 import java.io.IOException;
 
@@ -19,4 +20,5 @@ public interface Client {
 
     void stop();
     
+    GameHandler getGameHandler();
 }
