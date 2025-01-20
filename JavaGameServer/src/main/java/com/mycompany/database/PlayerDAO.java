@@ -1,11 +1,9 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
+* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+* Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
+*/
 package com.mycompany.database;
 
-import com.mycompany.database.PlayerDTO;
-import com.mycompany.database.PlayerScoreUpdateDTO;
 import java.util.List;
 
 /**
@@ -13,7 +11,19 @@ import java.util.List;
  * @author ArwaKhaled
  */
 public interface PlayerDAO {
-   List<PlayerDTO> getOnlinePlayers();
-  void updatePlayerScore( PlayerScoreUpdateDTO playerScoreUpdate);
+    static PlayerDAO getInstance() {
+        return PlayerDAOImpl.getInstance();
+    }
     
+    List<PlayerDTO> getOnlinePlayers();
+    
+    List<PlayerDTO> getAvailablePlayers();
+    List<PlayerDTO> getInGamePlayers();
+    
+    void setPlayerOnline(String username, boolean isOnline);
+    void setPlayerAvailable(String username, boolean isAvailable);
+    
+    void updatePlayerScore(PlayerScoreUpdateDTO playerScoreUpdate);
+    
+    void resetPlayersStatus();
 }
