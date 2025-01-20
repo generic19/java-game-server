@@ -5,7 +5,6 @@
 package com.mycompany.javagameserver.handling;
 
 import com.mycompany.database.PlayerDAO;
-import com.mycompany.database.PlayerScoreUpdateDTO;
 import com.mycompany.database.PlayerScoreUpdateDTOImp;
 import com.mycompany.game.Game;
 import com.mycompany.game.GameState;

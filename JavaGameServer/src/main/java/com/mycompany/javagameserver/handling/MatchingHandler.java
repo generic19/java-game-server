@@ -3,10 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.javagameserver.handling;
-
 import com.mycompany.database.OnlinePlayerDTO;
 import com.mycompany.database.PlayerDAO;
-import com.mycompany.database.PlayerDAOImpl;
+import com.mycompany.game.Game;
+import com.mycompany.game.Player;
+import com.mycompany.game.XOGame;
 import com.mycompany.javagameserver.Client;
 import com.mycompany.javagameserver.services.ClientService;
 import com.mycompany.javagameserver.services.ClientService.PlayerUpdateListener;
@@ -31,8 +32,6 @@ public class MatchingHandler implements Handler  , PlayerUpdateListener{
     
      OnlinePlayer   player;
      OnlinePlayer opponent = null;
-   
-     boolean isSubescribe ;
      AuthenticatedRequest authRequest ;
      Client client ;
      Handler next;
@@ -55,7 +54,6 @@ public class MatchingHandler implements Handler  , PlayerUpdateListener{
                 }else {
                     ClientService.getService().removePlayerUpdateListener(this);
                }
-                  this.isSubescribe= msg.isSubscribe();
             } else if(request.getMessage() instanceof InviteRequest){
                 InviteRequest msg= (InviteRequest)request.getMessage();
                 opponent = getOnlinePlayer(msg.getUserName());
@@ -69,7 +67,10 @@ public class MatchingHandler implements Handler  , PlayerUpdateListener{
                 Client opponentClient = ClientService.getService().getClientByUsername(opponentUserName);
                 opponentClient.sendMessage((new IncomingInviteRespose(msg.getResponse())));
                    if(msg.getResponse()==IncomingInviteRespose.Response.ACCEPTED){
-                   // to do 
+                   Game game= new XOGame();
+                   client.getGameHandler().startGame(game, player, opponent, Player.one);
+                   opponentClient.getGameHandler().startGame(game, opponent, player, Player.two);
+                   
                    }
             }else if(opponent!=null){
                 next.handle(request);
