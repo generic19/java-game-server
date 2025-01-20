@@ -4,6 +4,7 @@
 */
 package com.mycompany.database;
 
+import com.mycompany.networking.OnlinePlayer;
 import java.util.List;
 
 /**
@@ -15,10 +16,13 @@ public interface PlayerDAO {
         return PlayerDAOImpl.getInstance();
     }
     
+    
     List<PlayerDTO> getOnlinePlayers();
     
     List<PlayerDTO> getAvailablePlayers();
     List<PlayerDTO> getInGamePlayers();
+    
+    OnlinePlayerDTO getOnlinePlayer(String username);
     
     void setPlayerOnline(String username, boolean isOnline);
     void setPlayerAvailable(String username, boolean isAvailable);

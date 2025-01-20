@@ -6,6 +6,8 @@ import com.mycompany.networking.OnlinePlayer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -84,7 +86,7 @@ public class ClientService {
             .getAvailablePlayers()
             .stream()
             .map(dto -> new OnlinePlayer(dto.getUsername(), dto.getScore()))
-            .toList();
+            .collect(Collectors.toList());
     }
     
     public List<OnlinePlayer> getInGame() {
@@ -93,7 +95,7 @@ public class ClientService {
             .getInGamePlayers()
             .stream()
             .map(dto -> new OnlinePlayer(dto.getUsername(), dto.getScore()))
-            .toList();
+            .collect(Collectors.toList());
     }
     
     public void addPlayerUpdateListener(PlayerUpdateListener listener) {
@@ -109,7 +111,7 @@ public class ClientService {
     }
     
     @FunctionalInterface
-    interface PlayerUpdateListener {
+    public interface PlayerUpdateListener {
         void onPlayerUpdate(String username, boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame);
     }
 }

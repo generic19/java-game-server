@@ -27,11 +27,10 @@ import java.util.List;
  *
  * @author ArwaKhaled
  */
-public class MatchingHandler implements Handler  , PlayerUpdateListener{
+public class MatchingHandler implements Handler, PlayerUpdateListener {
     
      OnlinePlayer   player;
      OnlinePlayer opponent = null;
-     PlayerDAO playerDAO= new PlayerDAOImpl();
      boolean isSubescribe ;
      AuthenticatedRequest authRequest ;
      Client client ;
@@ -72,7 +71,7 @@ public class MatchingHandler implements Handler  , PlayerUpdateListener{
        next=handler;
     }
       OnlinePlayer getOnlinePlayer(String userName){
-        OnlinePlayerDTO onlinePlayerDTO =  playerDAO.getOnlinePlayer(userName) ;
+        OnlinePlayerDTO onlinePlayerDTO =  PlayerDAO.getInstance().getOnlinePlayer(userName) ;
        return onlinePlayerDTO.getPlayer();
     }
 

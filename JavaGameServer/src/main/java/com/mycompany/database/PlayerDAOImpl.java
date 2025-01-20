@@ -75,18 +75,22 @@ public class PlayerDAOImpl implements PlayerDAO {
             ex.printStackTrace();
         }
     }
-
+    
     @Override
     public OnlinePlayerDTO getOnlinePlayer(String userName) {
         
-         OnlinePlayerDTO  onlinePlayerDTO  =null ;
-         
-          try {
-           Connection connection = Database.getInstance().getConnection();
-           PreparedStatement prepareStatement = connection.prepareStatement("SELECT score FROM USERS WHERE user_name = ?", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-           prepareStatement.setString(1, userName);
-           ResultSet res = prepareStatement.executeQuery();
-           int score =res.getInt("score");
+        OnlinePlayerDTO  onlinePlayerDTO  =null ;
+        
+        try {
+            Connection connection = Database.getInstance().getConnection();
+            PreparedStatement prepareStatement = connection.prepareStatement(
+                "SELECT score FROM USERS WHERE user_name = ?",
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            );
+            prepareStatement.setString(1, userName);
+            ResultSet res = prepareStatement.executeQuery();
+            int score =res.getInt("score");
             onlinePlayerDTO = new OnlinePlayerDTOImpl(new OnlinePlayer(userName,score));
         } catch (SQLException ex) {
             Logger.getLogger(PlayerDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -95,11 +99,11 @@ public class PlayerDAOImpl implements PlayerDAO {
         return onlinePlayerDTO;
         
     }
-    }
     
     @Override
     public List<PlayerDTO> getAvailablePlayers() {
-    
+        return getOnlinePlayersByAvailability(true);
+    }
     
     @Override
     public List<PlayerDTO> getInGamePlayers() {
@@ -182,7 +186,7 @@ public class PlayerDAOImpl implements PlayerDAO {
             ex.printStackTrace();
         }
     }
-
+    
     @Override
     public int getScore(String username) {
         try {
