@@ -14,14 +14,12 @@ import com.mycompany.networking.OnlinePlayer;
 public class MatchingRequest extends AuthenticatedRequest {
      OnlinePlayer player;
      OnlinePlayer opponent;
-     boolean isInGame;
       EndMatch endMatchHandler;
 
     public MatchingRequest(OnlinePlayer player, OnlinePlayer opponent, boolean isInGame, String userName, Message message ,EndMatch endMatchHandler) {
         super(userName, message);
         this.player = player;
-        this.opponent = opponent;
-        this.isInGame = isInGame;
+        this.opponent = opponent; 
         this.endMatchHandler= endMatchHandler;
     }
 

@@ -4,6 +4,8 @@
  */
 package com.mycompany.javagameserver;
 
+import com.mycompany.javagameserver.handling.GameHandler;
+import com.mycompany.javagameserver.handling.MatchingHandler;
 import com.mycompany.networking.Message;
 import java.io.IOException;
 
@@ -12,11 +14,12 @@ import java.io.IOException;
  * @author basel
  */
 public interface Client {
-
     void sendMessage(Message message) throws IllegalStateException;
 
     void start() throws IllegalStateException, IOException;
 
     void stop();
     
+    MatchingHandler getMatchingHandler();
+    GameHandler getGameHandler();
 }
