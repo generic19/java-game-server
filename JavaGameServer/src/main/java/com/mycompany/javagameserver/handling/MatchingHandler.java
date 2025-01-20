@@ -27,10 +27,11 @@ import java.util.List;
  *
  * @author ArwaKhaled
  */
-public class MatchingHandler implements Handler, PlayerUpdateListener {
+public class MatchingHandler implements Handler  , PlayerUpdateListener{
     
      OnlinePlayer   player;
      OnlinePlayer opponent = null;
+   
      boolean isSubescribe ;
      AuthenticatedRequest authRequest ;
      Client client ;
@@ -56,14 +57,34 @@ public class MatchingHandler implements Handler, PlayerUpdateListener {
                }
                   this.isSubescribe= msg.isSubscribe();
             } else if(request.getMessage() instanceof InviteRequest){
-               
+                InviteRequest msg= (InviteRequest)request.getMessage();
+                opponent = getOnlinePlayer(msg.getUserName());
+                
+                Client opponentClient=  ClientService.getService().getClientByUsername(msg.getUserName());
+                opponentClient.getMatchingHandler().setOpponent(player);
+                opponentClient.sendMessage(new IncomingInviteRequest(authRequest.getUserName()));
             }else if(request.getMessage() instanceof IncomingInviteRespose ){
+                IncomingInviteRespose msg = (IncomingInviteRespose)request.getMessage();
+                String opponentUserName=  client.getMatchingHandler().getOpponent().getUsername();
+                Client opponentClient = ClientService.getService().getClientByUsername(opponentUserName);
+                opponentClient.sendMessage((new IncomingInviteRespose(msg.getResponse())));
+                   if(msg.getResponse()==IncomingInviteRespose.Response.ACCEPTED){
+                   // to do 
+                   }
+            }else if(opponent!=null){
+                next.handle(request);
                 
-                
+            
+       }
+    }
+    }
 
-                 
-}
-            }
+    public OnlinePlayer getOpponent() {
+        return opponent;
+    }
+
+    public void setOpponent(OnlinePlayer opponent) {
+        this.opponent = opponent;
     }
     
     @Override
@@ -77,7 +98,13 @@ public class MatchingHandler implements Handler, PlayerUpdateListener {
 
     @Override
     public void onPlayerUpdate(String username, boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame) {
-     
+        
+        MatchingUpdateMessage.UpdateType updateType= isAdd?
+        MatchingUpdateMessage.UpdateType.ADD:MatchingUpdateMessage.UpdateType.REMOVE;
+        MatchingUpdateMessage.Target target =  isAvailable? 
+        MatchingUpdateMessage.Target.AVAILABLE:MatchingUpdateMessage.Target.IN_GAME;
+        MatchingUpdateMessage msg = new MatchingUpdateMessage( username,updateType,target);
+        client.sendMessage(msg);
     }
 
     @Override
@@ -87,3 +114,4 @@ public class MatchingHandler implements Handler, PlayerUpdateListener {
     
     
 }
+
