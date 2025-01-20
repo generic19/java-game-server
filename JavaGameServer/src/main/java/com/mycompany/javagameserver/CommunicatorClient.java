@@ -19,6 +19,8 @@ public class CommunicatorClient implements Client {
     ObjectOutputStream outputStream;
     Thread thread;
     boolean serverOn = true;
+    MatchingHandler matchingHandler;
+    GameHandler gameHandler;
     
     public CommunicatorClient(Socket socket) {
         this.socket = socket;
@@ -35,9 +37,15 @@ public class CommunicatorClient implements Client {
     public void start() {
         // AuthHandler  -->  MatchingHandler  -->  GameHandler
         Handler authHandler = new AuthHandler();
-        
+        matchingHandler = new MatchingHandler();
+        gameHandler = new GameHandler();
         authHandler.bind(this);
-//        authHandler.setNext(matchingHandler);
+        matchingHandler.bind(this);
+        gameHandler.bind(this);
+        authHandler.setNext(matchingHandler);
+        matchingHandler.setNext(gameHandler);
+        
+        
         
         thread = new Thread(() -> {
             while (serverOn) {
@@ -81,11 +89,11 @@ public class CommunicatorClient implements Client {
 
     @Override
     public MatchingHandler getMatchingHandler() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return matchingHandler;
     }
     
     @Override
     public GameHandler getGameHandler() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return gameHandler;
     }
 }
