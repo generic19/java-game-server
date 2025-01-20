@@ -11,20 +11,19 @@ import com.mycompany.database.UserDTO;
 import com.mycompany.database.UserDTOImpl;
 import com.mycompany.javagameserver.Client;
 import com.mycompany.javagameserver.services.ClientService;
-import com.mycompany.javagameserver.services.ClientServiceImpl;
 import com.mycompany.networking.Message;
 import com.mycompany.networking.authentication.RegisterRequest;
 import com.mycompany.networking.authentication.RegisterRespose;
 import com.mycompany.networking.authentication.SignInRequest;
 import com.mycompany.networking.authentication.SignInResponse;
 import com.mycompany.networking.authentication.SignInWithTokenRequest;
+import com.mycompany.networking.authentication.SignInWithTokenResponse;
 import com.mycompany.networking.authentication.SignOutRequest;
+import com.mycompany.networking.authentication.SignOutRespons;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -118,13 +117,33 @@ public class AuthHandler implements Handler {
             client.sendMessage(message);
             // ClientServiceImpl.getInstance(); --> return client
         } else if (request.getMessage() instanceof SignInWithTokenRequest) {
-            // do some logic
             
+            Message message;
+            SignInWithTokenRequest signInWithTokenRequest = (SignInWithTokenRequest) request.getMessage();
+            
+            UserDAO userDAO = new UserDAOImpl();
+            String userName = userDAO.loginWithToken(signInWithTokenRequest.getToken());
+            
+            if(userName == null){
+                message = new SignInWithTokenResponse(false);
+            } else {
+                message = new SignInWithTokenResponse(true);
+                ClientService.getService().setUsername(client, userName);    
+            }
+            
+            client.sendMessage(message);
             // ClientServiceImpl.getInstance(); --> return client
         } else if (request.getMessage() instanceof SignOutRequest) {
-            // do some logic
+            SignOutRequest signOutRequest = (SignOutRequest) request.getMessage();
             
-            // null username
+            UserDAO userDAO = new UserDAOImpl();
+            boolean result = userDAO.logOut(signOutRequest.getUserName());
+            
+            Message message = new SignOutRespons(result);
+            
+            client.sendMessage(message);
+            
+            ClientService.getService().setUsername(client, null);
         } else {
             handler.handle(request);
         }

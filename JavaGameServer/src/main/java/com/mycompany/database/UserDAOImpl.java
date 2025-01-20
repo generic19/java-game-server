@@ -30,6 +30,7 @@ public class UserDAOImpl implements UserDAO {
                     registerResult = RegisterResult.REGISTERD_SUCCESSFULLY;
                     
                     updateOnlineStatus(user.getUsername(), true);
+                    updateAvailableStatus(user.getUsername(), true);
                     
                     System.out.println("User registered successfully.");
                 } 
@@ -87,6 +88,26 @@ public class UserDAOImpl implements UserDAO {
         return isUpdate;
     }
     
+    private boolean updateAvailableStatus(String userName, boolean isAvailable){
+        boolean isUpdate = true;
+        String query = "UPDATE users set is_available = ? WHERE user_name = ?";
+        
+        try (Connection connection = Database.getInstance().getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setBoolean(1, isAvailable);
+            preparedStatement.setString(2, userName);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+        } catch (Exception e) {
+            isUpdate = false;
+            e.printStackTrace();
+        }
+        
+        return isUpdate;
+    }
+    
     private boolean updateToken(String userName, String token){
         boolean isUpdate = true;
         String query = "UPDATE users set token = ? WHERE user_name = ?";
@@ -113,6 +134,7 @@ public class UserDAOImpl implements UserDAO {
         LoginResult loginResult = LoginResult.DB_ERROR;
         String query = "SELECT * FROM users WHERE user_name = ? AND password_hash = ?";
         try (Connection connection = Database.getInstance().getConnection()) {
+            
             PreparedStatement preparedStatement = connection.prepareStatement(query);
 
             preparedStatement.setString(1, user.getUsername());
@@ -125,6 +147,7 @@ public class UserDAOImpl implements UserDAO {
                 } else{
                     loginResult = LoginResult.LOGGED_IN_SUCCESSFULLY;
                     updateOnlineStatus(user.getUsername(), true);
+                    updateAvailableStatus(user.getUsername(), true);
                     updateToken(user.getUsername(), user.getToken());
                 }
             } else {
@@ -142,10 +165,47 @@ public class UserDAOImpl implements UserDAO {
         
         return loginResult;
     }
+    
+    
 
     @Override
-    public void logOut() {
+    public boolean logOut(String userName) {
+        updateToken(userName, null);
+        return updateOnlineStatus(userName, false);
+        
+    }
 
+    @Override
+    public String loginWithToken(String token) {
+        String userName = null;
+        
+        String query = "SELECT * FROM users WHERE token = ?"; 
+        
+        try (Connection connection = Database.getInstance().getConnection()) {
+            
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setString(1, token);
+            
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                userName = resultSet.getString("user_name");
+                updateOnlineStatus(userName, true);
+                updateAvailableStatus(userName, true);
+            } else {
+                System.out.println("EXPIRED OR WRONG TOKEN");
+            }
+            
+            preparedStatement.close();
+            resultSet.close();
+        } catch (Exception e) {
+            System.out.println("Error DB");
+            e.printStackTrace();
+        }
+        
+        return userName;
+        
     }
 
 }

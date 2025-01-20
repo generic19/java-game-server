@@ -8,5 +8,6 @@ public interface UserDAO {
 
     RegisterResult register(UserDTO user);
     LoginResult login(UserDTO user);
-    void logOut();
+    String loginWithToken(String token);
+    boolean logOut(String userName);
 }
