@@ -27,11 +27,14 @@ USE `JavaGame`;
 -- Table structure for table `users`
 --
 
-CREATE TABLE IF NOT EXISTS `users` (
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
   `user_name` varchar(25) NOT NULL,
   `password_hash` varchar(128) NOT NULL,
   `score` int(11) NOT NULL DEFAULT '0',
   `is_online` bit(1) NOT NULL DEFAULT b'0',
   `is_available` bit(1) NOT NULL DEFAULT b'0',
+  `token` varchar(128) NULL,
   PRIMARY KEY (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
