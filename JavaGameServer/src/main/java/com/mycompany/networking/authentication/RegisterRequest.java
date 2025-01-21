@@ -4,7 +4,7 @@ public class RegisterRequest implements AuthMessage {
     private String username;
     private String password;
    
-    public RegisterRequest(String username, String password, String email) {
+    public RegisterRequest(String username, String password) {
         this.username = username;
         this.password = password;
     }

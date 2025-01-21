@@ -82,7 +82,7 @@ public class AuthHandler implements Handler {
             
             client.sendMessage(message);
         } else if (request.getMessage() instanceof SignInRequest) {
-            // do some logic
+            
             SignInRequest signInRequest = (SignInRequest) request.getMessage();
             
             String hashedPassword = getHashedPassword(signInRequest.getPassword());
@@ -115,7 +115,6 @@ public class AuthHandler implements Handler {
             }
             
             client.sendMessage(message);
-            // ClientServiceImpl.getInstance(); --> return client
         } else if (request.getMessage() instanceof SignInWithTokenRequest) {
             
             Message message;
@@ -128,12 +127,12 @@ public class AuthHandler implements Handler {
                 message = new SignInWithTokenResponse(false);
             } else {
                 message = new SignInWithTokenResponse(true);
-                ClientService.getService().setUsername(client, userName);    
+                ClientService.getService().setUsername(client, userName);
             }
             
             client.sendMessage(message);
-            // ClientServiceImpl.getInstance(); --> return client
         } else if (request.getMessage() instanceof SignOutRequest) {
+            
             SignOutRequest signOutRequest = (SignOutRequest) request.getMessage();
             
             UserDAO userDAO = new UserDAOImpl();

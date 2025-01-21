@@ -45,8 +45,6 @@ public class CommunicatorClient implements Client {
         authHandler.setNext(matchingHandler);
         matchingHandler.setNext(gameHandler);
         
-        
-        
         thread = new Thread(() -> {
             while (serverOn) {
                 

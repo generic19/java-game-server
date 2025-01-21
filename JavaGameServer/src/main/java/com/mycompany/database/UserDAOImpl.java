@@ -128,7 +128,6 @@ public class UserDAOImpl implements UserDAO {
         return isUpdate;
     }
 
-
     @Override
     public LoginResult login(UserDTO user) {
         LoginResult loginResult = LoginResult.DB_ERROR;
@@ -166,11 +165,10 @@ public class UserDAOImpl implements UserDAO {
         return loginResult;
     }
     
-    
-
     @Override
     public boolean logOut(String userName) {
         updateToken(userName, null);
+        updateAvailableStatus(userName, false);
         return updateOnlineStatus(userName, false);
         
     }
@@ -186,7 +184,6 @@ public class UserDAOImpl implements UserDAO {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
 
             preparedStatement.setString(1, token);
-            
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -205,7 +202,5 @@ public class UserDAOImpl implements UserDAO {
         }
         
         return userName;
-        
     }
-
 }
