@@ -18,6 +18,14 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        try {
+            Database.getInstance();
+            new Server(5005).start();
+        } catch (SQLException ex) {
+            System.out.println("DB server is not connected!");
+            System.exit(0);
+        }
+
         scene = new Scene(loadFXML("primary"), 640, 480);
         stage.setScene(scene);
         stage.show();
@@ -34,13 +42,5 @@ public class App extends Application {
 
     public static void main(String[] args) {
         launch();
-        
-        try {
-            Database.getInstance();
-            new Server(5555).start();
-        } catch (SQLException ex) {
-            System.out.println("DB server is not connected!");
-            System.exit(0);
-        }
     }
 }

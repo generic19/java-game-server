@@ -9,16 +9,16 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**                     
+/**
  *
  * @author basel
  */
 public class CommunicatorClient implements Client {
+    
     private final Socket socket;
     ObjectInputStream inputStream;
     ObjectOutputStream outputStream;
     Thread thread;
-    boolean serverOn = true;
     MatchingHandler matchingHandler;
     GameHandler gameHandler;
     
@@ -46,24 +46,23 @@ public class CommunicatorClient implements Client {
         matchingHandler.setNext(gameHandler);
         
         thread = new Thread(() -> {
-            while (serverOn) {
-                
-                try {
-                    Object obj = inputStream.readObject();
+            try {
+                while (true) {
                     
-                    Message msg = (Message) obj;
-                    
-                    Request request = new Request(msg);
-                    
-                    authHandler.handle(request);                    
-                } catch (IOException ex) {
-                    // close responding to messages
-                    serverOn = false;
-                    stop();
-                } catch (ClassNotFoundException ex) {
-                    serverOn = false;
-                    Logger.getLogger(CommunicatorClient.class.getName()).log(Level.SEVERE, null, ex);
-                }                
+                    try {
+                        Object obj = inputStream.readObject();
+                        
+                        Message msg = (Message) obj;
+                        
+                        Request request = new Request(msg);
+                        
+                        authHandler.handle(request);
+                    } catch (ClassNotFoundException ex) {
+                        System.err.println("Error reading message from socket.");
+                    }
+                }
+            } catch (IOException ex) {
+                System.out.println("Client socket closed.");
             }
         });
         thread.start();
@@ -71,8 +70,10 @@ public class CommunicatorClient implements Client {
     
     @Override
     public void stop() {
-        if (thread.isAlive()) {
-            thread.stop();
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            System.err.println("Could not close socket.");
         }
     }
     
@@ -84,7 +85,7 @@ public class CommunicatorClient implements Client {
             // to be handled
         }
     }
-
+    
     @Override
     public MatchingHandler getMatchingHandler() {
         return matchingHandler;

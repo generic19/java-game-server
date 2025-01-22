@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserDAOImpl implements UserDAO {
-
+    
     @Override
     public RegisterResult register(UserDTO user) {
         String query = "INSERT INTO users (user_name, password_hash, token) VALUES (?, ?, ?)";
@@ -16,15 +16,17 @@ public class UserDAOImpl implements UserDAO {
         RegisterResult registerResult = RegisterResult.DB_ERROR;
         
         if(isUserExist(user.getUsername())){
-           registerResult = RegisterResult.ALREADY_REGISTERD; 
+            registerResult = RegisterResult.ALREADY_REGISTERD;
         } else {
-           try (Connection connection = Database.getInstance().getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
+            
+            try {
+                Connection connection = Database.getInstance().getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(query);
+                
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, user.getPasswordHash());
                 preparedStatement.setString(3, user.getToken());
-
+                
                 int rowsAffected = preparedStatement.executeUpdate();
                 if (rowsAffected > 0) {
                     registerResult = RegisterResult.REGISTERD_SUCCESSFULLY;
@@ -33,13 +35,13 @@ public class UserDAOImpl implements UserDAO {
                     updateAvailableStatus(user.getUsername(), true);
                     
                     System.out.println("User registered successfully.");
-                } 
+                }
                 
                 preparedStatement.close();
             } catch (Exception e) {
                 registerResult = RegisterResult.DB_ERROR;
                 e.printStackTrace();
-            } 
+            }
         }
         
         return registerResult;
@@ -47,7 +49,7 @@ public class UserDAOImpl implements UserDAO {
     
     public boolean isUserExist (String userName){
         boolean isExist = true;
-        String query = "SELECT * FROM users WHERE user_name = ?";
+        String query = "SELECT 1 FROM users WHERE user_name = ? LIMIT 1";
         
         try {
             Connection connection = Database.getInstance().getConnection();
@@ -72,12 +74,13 @@ public class UserDAOImpl implements UserDAO {
         boolean isUpdate = true;
         String query = "UPDATE users set is_online = ? WHERE user_name = ?";
         
-        try (Connection connection = Database.getInstance().getConnection()) {
+        try {
+            Connection connection = Database.getInstance().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-
+            
             preparedStatement.setBoolean(1, isOnline);
             preparedStatement.setString(2, userName);
-
+            
             preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch (Exception e) {
@@ -92,12 +95,13 @@ public class UserDAOImpl implements UserDAO {
         boolean isUpdate = true;
         String query = "UPDATE users set is_available = ? WHERE user_name = ?";
         
-        try (Connection connection = Database.getInstance().getConnection()) {
+        try {
+            Connection connection = Database.getInstance().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-
+            
             preparedStatement.setBoolean(1, isAvailable);
             preparedStatement.setString(2, userName);
-
+            
             preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch (Exception e) {
@@ -112,12 +116,13 @@ public class UserDAOImpl implements UserDAO {
         boolean isUpdate = true;
         String query = "UPDATE users set token = ? WHERE user_name = ?";
         
-        try (Connection connection = Database.getInstance().getConnection()) {
+        try {
+            Connection connection = Database.getInstance().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-
+            
             preparedStatement.setString(1, token);
             preparedStatement.setString(2, userName);
-
+            
             preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch (Exception e) {
@@ -127,18 +132,18 @@ public class UserDAOImpl implements UserDAO {
         
         return isUpdate;
     }
-
+    
     @Override
     public LoginResult login(UserDTO user) {
         LoginResult loginResult = LoginResult.DB_ERROR;
         String query = "SELECT * FROM users WHERE user_name = ? AND password_hash = ?";
-        try (Connection connection = Database.getInstance().getConnection()) {
-            
+        try {
+           Connection connection = Database.getInstance().getConnection(); 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-
+            
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getPasswordHash());
-
+            
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 if(resultSet.getBoolean("is_online")){
@@ -172,19 +177,19 @@ public class UserDAOImpl implements UserDAO {
         return updateOnlineStatus(userName, false);
         
     }
-
+    
     @Override
     public String loginWithToken(String token) {
         String userName = null;
         
-        String query = "SELECT * FROM users WHERE token = ?"; 
+        String query = "SELECT * FROM users WHERE token = ?";
         
-        try (Connection connection = Database.getInstance().getConnection()) {
-            
+        try {
+            Connection connection = Database.getInstance().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-
+            
             preparedStatement.setString(1, token);
-
+            
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 userName = resultSet.getString("user_name");
