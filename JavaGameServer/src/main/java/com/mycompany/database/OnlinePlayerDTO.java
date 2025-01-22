@@ -4,15 +4,12 @@
  */
 package com.mycompany.database;
 
+import com.mycompany.networking.OnlinePlayer;
+
 /**
  *
  * @author ArwaKhaled
  */
-public interface UserDTO {
-    
-    String getUsername();
- 
-    String getPasswordHash();
-    
-    String getToken();
+public interface OnlinePlayerDTO {
+    OnlinePlayer getPlayer() ;
 }

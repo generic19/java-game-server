@@ -2,17 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package com.mycompany.database;
+package com.mycompany.networking;
+
+import java.io.Serializable;
 
 /**
  *
- * @author ArwaKhaled
+ * @author AhmedAli
  */
-public interface UserDTO {
+public interface Message extends Serializable {
     
-    String getUsername();
- 
-    String getPasswordHash();
     
-    String getToken();
 }

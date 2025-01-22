@@ -2,17 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package com.mycompany.database;
+package com.mycompany.networking.matching;
 
+import com.mycompany.networking.Message;
 /**
  *
- * @author ArwaKhaled
+ * @author AhmedAli
  */
-public interface UserDTO {
+public interface MatchingMessage extends Message {
     
-    String getUsername();
- 
-    String getPasswordHash();
-    
-    String getToken();
 }
