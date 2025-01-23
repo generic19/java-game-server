@@ -33,6 +33,7 @@ public class AuthHandler implements Handler {
     
     private Client client;
     private Handler handler;
+    private String username;
 
     @Override
     public void bind(Client client) {
@@ -66,16 +67,20 @@ public class AuthHandler implements Handler {
             switch (result) {
                 case DB_ERROR:
                     message = new RegisterRespose(false, null, "Something went wrong");
+                    username = null;
                     break;
                 case ALREADY_REGISTERD:
                     message = new RegisterRespose(false, null, "Already Registered. Login instead.");
+                    username = null;
                     break;
                 case REGISTERD_SUCCESSFULLY:
                     message = new RegisterRespose(true, generateToken, null);
+                    username = registerRequest.getUsername();
                     ClientService.getService().setUsername(client, registerRequest.getUsername());
                     break;
                 default:
                     System.out.println("Unknown Error");
+                    username = null;
                     message = new RegisterRespose(false, null, "Unknown Error");
                     break;
             }
@@ -97,19 +102,24 @@ public class AuthHandler implements Handler {
             switch (result) {
                 case DB_ERROR:
                     message = new SignInResponse(false, null, "Something went wrong");
+                    username = null;
                     break;
                 case WRONG_USERNAME_OR_PASSWORD:
                     message = new SignInResponse(false, null, "WRONG USERNAME OR PASSWORD.");
+                    username = null;
                     break;
                 case ALREADY_LOGGED_IN:
                     message = new SignInResponse(false, null, "ALREADY LOGGED IN.");
+                    username = null;
                     break;
                 case LOGGED_IN_SUCCESSFULLY:
                     message = new SignInResponse(true, generateToken, null);
+                    username = signInRequest.getUserName();
                     ClientService.getService().setUsername(client, signInRequest.getUserName());
                     break;
                 default:
                     System.out.println("Unknown Error");
+                    username = null;
                     message = new SignInResponse(false, null, "Unknown Error");
                     break;
             }
@@ -121,30 +131,29 @@ public class AuthHandler implements Handler {
             SignInWithTokenRequest signInWithTokenRequest = (SignInWithTokenRequest) request.getMessage();
             
             UserDAO userDAO = new UserDAOImpl();
-            String userName = userDAO.loginWithToken(signInWithTokenRequest.getToken());
+            username = userDAO.loginWithToken(signInWithTokenRequest.getToken());
             
-            if(userName == null){
+            if(username == null){
                 message = new SignInWithTokenResponse(false);
             } else {
                 message = new SignInWithTokenResponse(true);
-                ClientService.getService().setUsername(client, userName);
+                ClientService.getService().setUsername(client, username);
             }
             
             client.sendMessage(message);
-        } else if (request.getMessage() instanceof SignOutRequest) {
-            
-            SignOutRequest signOutRequest = (SignOutRequest) request.getMessage();
-            
-            UserDAO userDAO = new UserDAOImpl();
-            boolean result = userDAO.logOut(signOutRequest.getUserName());
-            
-            Message message = new SignOutRespons(result);
-            
-            client.sendMessage(message);
-            
-            ClientService.getService().setUsername(client, null);
-        } else {
-            handler.handle(request);
+        } else if (request.getMessage() instanceof SignOutRequest) {            
+            if (username != null) {
+                UserDAO userDAO = new UserDAOImpl();
+                boolean result = userDAO.logOut(username);
+                
+                Message message = new SignOutRespons(result);
+                
+                client.sendMessage(message);
+                
+                ClientService.getService().setUsername(client, null);
+            }
+        } else if (username != null) {
+            handler.handle(new AuthenticatedRequest(username, request.getMessage()));
         }
     }
 
