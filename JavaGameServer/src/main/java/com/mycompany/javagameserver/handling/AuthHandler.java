@@ -135,7 +135,12 @@ public class AuthHandler implements Handler {
             
             if(username == null){
                 message = new SignInWithTokenResponse(false);
-            } else {
+            } else if (ClientService.getService().getClientByUsername(username)!=null){
+                 message = new SignInWithTokenResponse(false);
+                 System.out.println("Login attempt denied. User " + username + " is already logged in.");
+            }
+            else {
+                
                 message = new SignInWithTokenResponse(true);
                 ClientService.getService().setUsername(client, username);
             }
