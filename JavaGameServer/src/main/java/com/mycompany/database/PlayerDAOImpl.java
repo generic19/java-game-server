@@ -78,9 +78,6 @@ public class PlayerDAOImpl implements PlayerDAO {
     
     @Override
     public OnlinePlayerDTO getOnlinePlayer(String userName) {
-        
-        OnlinePlayerDTO  onlinePlayerDTO  =null ;
-        
         try {
             Connection connection = Database.getInstance().getConnection();
             PreparedStatement prepareStatement = connection.prepareStatement(
@@ -90,14 +87,16 @@ public class PlayerDAOImpl implements PlayerDAO {
             );
             prepareStatement.setString(1, userName);
             ResultSet res = prepareStatement.executeQuery();
-            int score =res.getInt("score");
-            onlinePlayerDTO = new OnlinePlayerDTOImpl(new OnlinePlayer(userName,score));
+            
+            if (res.next()) {
+                int score =res.getInt("score");
+                return new OnlinePlayerDTOImpl(new OnlinePlayer(userName,score));
+            } else {
+                return null;
+            }
         } catch (SQLException ex) {
-            Logger.getLogger(PlayerDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
-        
-        return onlinePlayerDTO;
-        
     }
     
     @Override
