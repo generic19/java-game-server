@@ -66,8 +66,8 @@ public class PlayerDAOImpl implements PlayerDAO {
             
             PreparedStatement stmt = conn.prepareStatement("UPDATE Users SET score = ? WHERE user_name = ?");
             
-            stmt.setInt(0, playerScoreUpdate.getScore());
-            stmt.setString(1, playerScoreUpdate.getUsername());
+            stmt.setInt(1, playerScoreUpdate.getScore());
+            stmt.setString(2, playerScoreUpdate.getUsername());
             
             stmt.executeUpdate();
             
@@ -117,7 +117,7 @@ public class PlayerDAOImpl implements PlayerDAO {
                 "SELECT user_name, score FROM Users WHERE is_online = 1 AND is_available = ?"
             );
             
-            stmt.setInt(0, available ? 1 : 0);
+            stmt.setBoolean(1, available);
             
             ResultSet res = stmt.executeQuery();
             
@@ -146,8 +146,8 @@ public class PlayerDAOImpl implements PlayerDAO {
                 "UPDATE users SET is_online = ? WHERE user_name = ?"
             );
             
-            stmt.setInt(0, isOnline ? 1 : 0);
-            stmt.setString(1, username);
+            stmt.setBoolean(1, isOnline);
+            stmt.setString(2, username);
             
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -164,8 +164,8 @@ public class PlayerDAOImpl implements PlayerDAO {
                 "UPDATE users SET is_available = ? WHERE user_name = ?"
             );
             
-            stmt.setInt(0, isAvailable ? 1 : 0);
-            stmt.setString(1, username);
+            stmt.setBoolean(1, isAvailable);
+            stmt.setString(2, username);
             
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -193,7 +193,7 @@ public class PlayerDAOImpl implements PlayerDAO {
             
             PreparedStatement stmt = conn.prepareStatement("SELECT score FROM users WHERE user_name = ?");
             
-            stmt.setString(0, username);
+            stmt.setString(1, username);
             
             ResultSet rs = stmt.executeQuery();
             
