@@ -114,7 +114,7 @@ public class PlayerDAOImpl implements PlayerDAO {
             Connection conn = Database.getInstance().getConnection();
             
             PreparedStatement stmt = conn.prepareStatement(
-                "SELECT user_name, score FROM Users WHERE is_online = 1 AND is_available = ?"
+                "SELECT user_name, score FROM Users WHERE is_online = true AND is_available = ?"
             );
             
             stmt.setBoolean(1, available);
@@ -202,6 +202,48 @@ public class PlayerDAOImpl implements PlayerDAO {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+        }
+        
+        return 0;
+    }
+    
+    @Override
+    public int getPlayerCount() {
+        final String query = "SELECT count(*) as playerCount FROM users";
+        
+        try {
+            Connection conn = Database.getInstance().getConnection();
+            
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("playerCount");
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("Could not get player count.");
+        }
+        
+        return 0;
+    }
+    
+    @Override
+    public int getInGameCount() {
+        final String query = "SELECT sum(is_available = false and is_online = true) as inGameCount FROM users";
+        
+        try {
+            Connection conn = Database.getInstance().getConnection();
+            
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("inGameCount");
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("Could not get in-game count.");
         }
         
         return 0;

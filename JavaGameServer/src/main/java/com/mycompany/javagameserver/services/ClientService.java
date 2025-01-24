@@ -41,19 +41,41 @@ public class ClientService {
     }
     
     public void removeClient(Client client) {
+        String username = usernameByClient.getOrDefault(client, null);
+        
         clients.remove(client);
         clientByUsername.values().remove(client);
+        usernameByClient.remove(client);
+        
+        if (username != null) {
+            PlayerDAO.getInstance().setPlayerOnline(username, false);
+            PlayerDAO.getInstance().setPlayerAvailable(username, false);
+        }
     }
     
     public Collection<Client> getClients() {
         return Collections.unmodifiableCollection(clients);
     }
     
+    public int getUsernameCount() {
+        return usernameByClient.size();
+    }
+    
     public void setUsername(Client client, String username) {
         if (username != null) {
             clientByUsername.put(username, client);
             usernameByClient.put(client, username);
+            
+            PlayerDAO.getInstance().setPlayerOnline(username, true);
+            PlayerDAO.getInstance().setPlayerAvailable(username, true);
         } else {
+            String oldUsername = usernameByClient.getOrDefault(client, null);
+            
+            if (oldUsername != null) {
+                PlayerDAO.getInstance().setPlayerOnline(oldUsername, true);
+                PlayerDAO.getInstance().setPlayerAvailable(oldUsername, true);
+            }
+            
             clientByUsername.values().remove(client);
             usernameByClient.remove(client);
         }
@@ -78,6 +100,14 @@ public class ClientService {
         }
         
         PlayerDAO.getInstance().setPlayerOnline(username, isInGame);
+    }
+    
+    public int getPlayerCount() {
+        return PlayerDAO.getInstance().getPlayerCount();
+    }
+    
+    public int getInGameCount() {
+        return PlayerDAO.getInstance().getInGameCount();
     }
     
     public List<OnlinePlayer> getAvailable() {

@@ -4,9 +4,7 @@
  */
 package com.mycompany.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import org.mariadb.jdbc.Driver;
 /**
  *
@@ -19,6 +17,16 @@ public class Database {
     private Database() throws SQLException {
         DriverManager.registerDriver(new Driver());
         connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/JavaGame", "JavaGame", "JavaGame");
+        
+        prepareDatabase();
+    }
+    
+    private void prepareDatabase() throws SQLException {
+        String sql = "UPDATE users SET is_online = false, is_available = true";
+                    
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        }
     }
     
     public static Database getInstance() throws SQLException{

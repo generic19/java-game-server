@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<SplitPane dividerPositions="0.6909246575342466" orientation="VERTICAL" prefHeight="467.0" prefWidth="602.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.javagameserver.DashboardController">
+   <items>
+      <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+         <center>
+            <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+               <children>
+                  <VBox alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Canvas fx:id="activePlayersCanvas" height="150.0" width="150.0" />
+                              <Label fx:id="lblActivePlayersCount" textFill="#2f2f2f">
+                                 <font>
+                                    <Font name="System Bold" size="21.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </StackPane>
+                        <Label alignment="CENTER" text="Active Players" textAlignment="CENTER">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Canvas fx:id="onlinePlayersCanvas" height="150.0" width="150.0" />
+                              <Label fx:id="lblOnlinePlayersCount" textFill="#2f2f2f">
+                                 <font>
+                                    <Font name="System Bold" size="21.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </StackPane>
+                        <Label alignment="CENTER" text="Online Players" textAlignment="CENTER">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER" layoutX="160.0" layoutY="10.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Canvas fx:id="offlinePlayersCanvas" height="150.0" width="150.0" />
+                              <Label fx:id="lblOfflinePlayersCount" textFill="#2f2f2f">
+                                 <font>
+                                    <Font name="System Bold" size="21.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </StackPane>
+                        <Label alignment="CENTER" text="Offline Players" textAlignment="CENTER">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets left="30.0" right="30.0" />
+               </padding>
+            </HBox>
+         </center>
+         <bottom>
+            <VBox alignment="CENTER" prefHeight="121.0" prefWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER" prefWidth="600.0" spacing="10.0" VBox.vgrow="NEVER">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#onStartServer" prefWidth="120.0" style="-fx-background-color: #1aa1e3;" text="Start Server" textFill="WHITE">
+                           <padding>
+                              <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                           </padding>
+                           <effect>
+                              <DropShadow blurType="TWO_PASS_BOX" height="10.0" offsetY="2.0" radius="4.5" width="10.0">
+                                 <color>
+                                    <Color opacity="0.19502867758274078" />
+                                 </color>
+                              </DropShadow>
+                           </effect>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#onStopServer" prefWidth="120.0" style="-fx-background-color: #8298ad;" text="Stop Server" textFill="WHITE">
+                           <padding>
+                              <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                           </padding>
+                           <effect>
+                              <DropShadow height="10.0" offsetY="2.0" radius="4.5" width="10.0">
+                                 <color>
+                                    <Color opacity="0.20000000298023224" />
+                                 </color>
+                              </DropShadow>
+                           </effect>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefWidth="100.0" spacing="10.0" VBox.vgrow="NEVER">
+                     <children>
+                        <Circle fx:id="serverOnlineShape" radius="8.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0">
+                           <fill>
+                              <RadialGradient centerX="0.5" centerY="0.5" radius="0.49999999999999994">
+                                 <stops>
+                                    <Stop>
+                                       <color>
+                                          <Color red="0.3939814865589142" green="0.9078947305679321" blue="0.3572733998298645" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.006711409395973154">
+                                       <color>
+                                          <Color red="0.8287037014961243" green="1.0" blue="0.8458333611488342" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.7181208053691275">
+                                       <color>
+                                          <Color red="0.5600000023841858" green="1.0" blue="0.6647886037826538" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.8590604026845637">
+                                       <color>
+                                          <Color red="0.23845821619033813" green="0.5600000023841858" blue="0.21279999613761902" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="1.0">
+                                       <color>
+                                          <Color red="0.34837964177131653" green="0.5657894611358643" blue="0.35925012826919556" />
+                                       </color>
+                                    </Stop>
+                                 </stops>
+                              </RadialGradient>
+                           </fill>
+                        </Circle>
+                        <Circle fx:id="serverOfflineShape" layoutX="269.0" layoutY="19.0" radius="8.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0">
+                           <fill>
+                              <RadialGradient centerX="0.5" centerY="0.5" radius="0.49999999999999994">
+                                 <stops>
+                                    <Stop>
+                                       <color>
+                                          <Color red="0.3939814865589142" green="0.9078947305679321" blue="0.3572733998298645" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.006711409395973154">
+                                       <color>
+                                          <Color green="0.4868420958518982" blue="0.040570177137851715" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.7181208053691275">
+                                       <color>
+                                          <Color green="0.31578946113586426" blue="0.06842105090618134" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.8590604026845637">
+                                       <color>
+                                          <Color red="0.017105262726545334" green="0.17105263471603394" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="1.0">
+                                       <color>
+                                          <Color green="0.1315789520740509" blue="0.01315789483487606" />
+                                       </color>
+                                    </Stop>
+                                 </stops>
+                              </RadialGradient>
+                           </fill>
+                        </Circle>
+                        <Label fx:id="lblServerStatus" text="Server Online" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </bottom>
+      </BorderPane>
+      <TextArea fx:id="txtLog" editable="false" promptText="Server log" wrapText="true">
+         <font>
+            <Font size="12.0" />
+         </font>
+      </TextArea>
+   </items>
+</SplitPane>

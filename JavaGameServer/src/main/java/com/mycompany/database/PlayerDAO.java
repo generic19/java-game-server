@@ -30,5 +30,8 @@ public interface PlayerDAO {
     
     void resetPlayersStatus();
 
-    public int getScore(String username);
+    int getScore(String username);
+    
+    int getPlayerCount();
+    int getInGameCount();
 }
