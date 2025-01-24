@@ -34,4 +34,14 @@ public interface PlayerDAO {
     
     int getPlayerCount();
     int getInGameCount();
+    int getOnlineCount();
+    
+    void addListener(Listener listener);
+    void removeListener(Listener listener);
+
+    
+    @FunctionalInterface
+    public interface Listener {
+        void onPlayerUpdate(String username, boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame);
+    }
 }

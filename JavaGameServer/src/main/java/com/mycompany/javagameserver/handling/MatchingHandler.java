@@ -10,7 +10,6 @@ import com.mycompany.game.Player;
 import com.mycompany.game.XOGame;
 import com.mycompany.javagameserver.Client;
 import com.mycompany.javagameserver.services.ClientService;
-import com.mycompany.javagameserver.services.ClientService.PlayerUpdateListener;
 import com.mycompany.networking.OnlinePlayer;
 import com.mycompany.networking.matching.IncomingInviteRequest;
 import com.mycompany.networking.matching.IncomingInviteRespose;
@@ -28,7 +27,7 @@ import java.util.List;
  *
  * @author ArwaKhaled
  */
-public class MatchingHandler implements Handler  , PlayerUpdateListener{
+public class MatchingHandler implements Handler, PlayerDAO.Listener {
     
      OnlinePlayer   player;
      OnlinePlayer opponent = null;
@@ -44,15 +43,15 @@ public class MatchingHandler implements Handler  , PlayerUpdateListener{
                 player=getOnlinePlayer(authRequest.getUserName());
                MatchingSubscriptionRequest msg  = (MatchingSubscriptionRequest)request.getMessage();
                if(msg.isSubscribe()){
-                   ClientService.getService().setIsOnline(client,true);
+                   ClientService.getService().setIsInGame(client,false);
                    List<OnlinePlayer> availablePlayers=  ClientService.getService().getAvailable( );
                    List<OnlinePlayer> inGamePlayers=  ClientService.getService().getInGame();
                    MatchingInitialStateMessage message= new MatchingInitialStateMessage(availablePlayers, inGamePlayers);
                    client.sendMessage(message);
-                   ClientService.getService().addPlayerUpdateListener(this);
+                   PlayerDAO.getInstance().addListener(this);
                   
                 }else {
-                    ClientService.getService().removePlayerUpdateListener(this);
+                    PlayerDAO.getInstance().removeListener(this);
                }
             } else if(request.getMessage() instanceof InviteRequest){
                 InviteRequest msg= (InviteRequest)request.getMessage();

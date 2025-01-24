@@ -21,8 +21,6 @@ public class ClientService {
     private final Map<String, Client> clientByUsername = new ConcurrentHashMap();
     private final Map<Client, String> usernameByClient = new ConcurrentHashMap();
     
-    private final List<PlayerUpdateListener> listeners = new CopyOnWriteArrayList<>();
-    
     public static ClientService getService() {
         if (service == null) {
             synchronized (ClientService.class) {
@@ -57,8 +55,8 @@ public class ClientService {
         return Collections.unmodifiableCollection(clients);
     }
     
-    public int getUsernameCount() {
-        return usernameByClient.size();
+    public int getOnlineCount() {
+        return PlayerDAO.getInstance().getOnlineCount();
     }
     
     public void setUsername(Client client, String username) {
@@ -67,29 +65,16 @@ public class ClientService {
             usernameByClient.put(client, username);
             
             PlayerDAO.getInstance().setPlayerOnline(username, true);
-            PlayerDAO.getInstance().setPlayerAvailable(username, true);
         } else {
             String oldUsername = usernameByClient.getOrDefault(client, null);
             
             if (oldUsername != null) {
-                PlayerDAO.getInstance().setPlayerOnline(oldUsername, true);
-                PlayerDAO.getInstance().setPlayerAvailable(oldUsername, true);
+                PlayerDAO.getInstance().setPlayerOnline(oldUsername, false);
             }
             
             clientByUsername.values().remove(client);
             usernameByClient.remove(client);
         }
-    }
-    
-    public void setIsOnline(Client client, boolean isOnline) {
-        String username = usernameByClient.getOrDefault(client, null);
-        
-        if (username == null) {
-            throw new IllegalStateException("Cannot use setIsOnline before setting username for client.");
-        }
-        
-        PlayerDAO.getInstance().setPlayerOnline(username, isOnline);
-        
     }
     
     public void setIsInGame(Client client, boolean isInGame) {
@@ -99,7 +84,7 @@ public class ClientService {
             throw new IllegalStateException("Cannot use setIsInGame before setting username for client.");
         }
         
-        PlayerDAO.getInstance().setPlayerOnline(username, isInGame);
+        PlayerDAO.getInstance().setPlayerAvailable(username, !isInGame);
     }
     
     public int getPlayerCount() {
@@ -128,20 +113,7 @@ public class ClientService {
             .collect(Collectors.toList());
     }
     
-    public void addPlayerUpdateListener(PlayerUpdateListener listener) {
-        listeners.add(listener);
-    }
-    
-    public void removePlayerUpdateListener(PlayerUpdateListener listener) {
-        listeners.remove(listener);
-    }
-    
     public Client getClientByUsername(String username) {
         return clientByUsername.getOrDefault(username, null);
-    }
-    
-    @FunctionalInterface
-    public interface PlayerUpdateListener {
-        void onPlayerUpdate(String username, boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame);
     }
 }
