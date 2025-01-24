@@ -1,5 +1,6 @@
 package com.mycompany.database;
 
+import com.mycompany.javagameserver.services.ClientService;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -145,7 +146,7 @@ public class UserDAOImpl implements UserDAO {
 
                 try (ResultSet resultSet = stmt.executeQuery()) {
                     if (resultSet.next()) {
-                        if (resultSet.getBoolean("is_online")) {
+                        if (resultSet.getBoolean("is_online") && ClientService.getService().getClientByUsername(user.getUsername()) != null) {
                             return LoginResult.ALREADY_LOGGED_IN;
                         } else {
                             setOnlineStatus(user.getUsername(), true);

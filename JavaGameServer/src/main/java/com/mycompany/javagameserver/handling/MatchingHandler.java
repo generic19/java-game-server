@@ -104,7 +104,7 @@ public class MatchingHandler implements Handler  , PlayerUpdateListener{
         MatchingUpdateMessage.UpdateType.ADD:MatchingUpdateMessage.UpdateType.REMOVE;
         MatchingUpdateMessage.Target target =  isAvailable? 
         MatchingUpdateMessage.Target.AVAILABLE:MatchingUpdateMessage.Target.IN_GAME;
-        MatchingUpdateMessage msg = new MatchingUpdateMessage( username,updateType,target);
+        MatchingUpdateMessage msg = new MatchingUpdateMessage(getOnlinePlayer(username),updateType,target);
         client.sendMessage(msg);
     }
 
