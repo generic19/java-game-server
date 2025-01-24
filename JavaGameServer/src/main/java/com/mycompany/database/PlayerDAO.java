@@ -16,7 +16,6 @@ public interface PlayerDAO {
         return PlayerDAOImpl.getInstance();
     }
     
-    
     List<PlayerDTO> getOnlinePlayers();
     
     List<PlayerDTO> getAvailablePlayers();

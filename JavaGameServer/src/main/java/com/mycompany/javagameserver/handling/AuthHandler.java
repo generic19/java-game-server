@@ -60,8 +60,7 @@ public class AuthHandler implements Handler {
             String generateToken = generateToken();
             
             UserDTO user = new UserDTOImpl(registerRequest.getUsername(), hashedPassword, generateToken);
-            UserDAO userDAO = new UserDAOImpl();
-            RegisterResult result = userDAO.register(user);
+            RegisterResult result = UserDAO.getInstance().register(user);
             
             Message message;
             switch (result) {
@@ -95,8 +94,7 @@ public class AuthHandler implements Handler {
             String generateToken = generateToken();
             
             UserDTO user = new UserDTOImpl(signInRequest.getUserName(), hashedPassword, generateToken);
-            UserDAO userDAO = new UserDAOImpl();
-            LoginResult result = userDAO.login(user);
+            LoginResult result = UserDAO.getInstance().login(user);
             
             Message message;
             switch (result) {
@@ -130,8 +128,7 @@ public class AuthHandler implements Handler {
             Message message;
             SignInWithTokenRequest signInWithTokenRequest = (SignInWithTokenRequest) request.getMessage();
             
-            UserDAO userDAO = new UserDAOImpl();
-            username = userDAO.loginWithToken(signInWithTokenRequest.getToken());
+            username = UserDAO.getInstance().loginWithToken(signInWithTokenRequest.getToken());
             
             if(username == null){
                 message = new SignInWithTokenResponse(false);
@@ -148,8 +145,7 @@ public class AuthHandler implements Handler {
             client.sendMessage(message);
         } else if (request.getMessage() instanceof SignOutRequest) {            
             if (username != null) {
-                UserDAO userDAO = new UserDAOImpl();
-                boolean result = userDAO.logOut(username);
+                boolean result = UserDAO.getInstance().logOut(username);
                 
                 Message message = new SignOutRespons(result);
                 

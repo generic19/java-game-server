@@ -1,5 +1,6 @@
 package com.mycompany.database;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,204 +9,199 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserDAOImpl implements UserDAO {
-    
+
+    private static UserDAOImpl instance;
+
+    public static UserDAOImpl getInstance() {
+        if (instance == null) {
+            synchronized (UserDAOImpl.class) {
+                if (instance == null) {
+                    instance = new UserDAOImpl();
+                }
+            }
+        }
+        return instance;
+    }
+
+    private UserDAOImpl() {
+    }
+
     @Override
     public RegisterResult register(UserDTO user) {
-        String query = "INSERT INTO users (user_name, password_hash, token) VALUES (?, ?, ?)";
-        
+        String query = "INSERT INTO users (user_name, password_hash, token, is_online, is_available) VALUES (?, ?, ?, 1, 1)";
+
         RegisterResult registerResult = RegisterResult.DB_ERROR;
-        
-        if(isUserExist(user.getUsername())){
+
+        if (checkUserExists(user.getUsername())) {
             registerResult = RegisterResult.ALREADY_REGISTERD;
         } else {
-            
             try {
                 Connection connection = Database.getInstance().getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                
-                preparedStatement.setString(1, user.getUsername());
-                preparedStatement.setString(2, user.getPasswordHash());
-                preparedStatement.setString(3, user.getToken());
-                
-                int rowsAffected = preparedStatement.executeUpdate();
-                if (rowsAffected > 0) {
-                    registerResult = RegisterResult.REGISTERD_SUCCESSFULLY;
-                    
-                    updateOnlineStatus(user.getUsername(), true);
-                    updateAvailableStatus(user.getUsername(), true);
-                    
-                    System.out.println("User registered successfully.");
+
+                try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                    stmt.setString(1, user.getUsername());
+                    stmt.setString(2, user.getPasswordHash());
+                    stmt.setString(3, user.getToken());
+
+                    int rowsAffected = stmt.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        registerResult = RegisterResult.REGISTERD_SUCCESSFULLY;
+                    }
                 }
-                
-                preparedStatement.close();
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 registerResult = RegisterResult.DB_ERROR;
-                e.printStackTrace();
             }
         }
-        
+
         return registerResult;
     }
-    
-    public boolean isUserExist (String userName){
-        boolean isExist = true;
+
+    public boolean checkUserExists(String userName) {
         String query = "SELECT 1 FROM users WHERE user_name = ? LIMIT 1";
-        
+
         try {
             Connection connection = Database.getInstance().getConnection();
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
-            
-            prepareStatement.setString(1, userName);
-            ResultSet result = prepareStatement.executeQuery();
-            
-            isExist = result.next();
-            
-            prepareStatement.close();
-            result.close();
-            
+
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, userName);
+
+                try (ResultSet result = stmt.executeQuery()) {
+                    return result.next();
+                }
+            }
         } catch (SQLException ex) {
-            Logger.getLogger(UserDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
-        
-        return isExist;
     }
-    
-    private boolean updateOnlineStatus(String userName, boolean isOnline){
+
+    private boolean setOnlineStatus(String userName, boolean isOnline) {
         boolean isUpdate = true;
         String query = "UPDATE users set is_online = ? WHERE user_name = ?";
-        
+
         try {
             Connection connection = Database.getInstance().getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            
-            preparedStatement.setBoolean(1, isOnline);
-            preparedStatement.setString(2, userName);
-            
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-        } catch (Exception e) {
-            isUpdate = false;
-            e.printStackTrace();
+
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setBoolean(1, isOnline);
+                stmt.setString(2, userName);
+
+                stmt.executeUpdate();
+
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
         }
-        
-        return isUpdate;
     }
-    
-    private boolean updateAvailableStatus(String userName, boolean isAvailable){
-        boolean isUpdate = true;
+
+    private boolean setAvailableStatus(String userName, boolean isAvailable) {
         String query = "UPDATE users set is_available = ? WHERE user_name = ?";
-        
+
         try {
             Connection connection = Database.getInstance().getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            
-            preparedStatement.setBoolean(1, isAvailable);
-            preparedStatement.setString(2, userName);
-            
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-        } catch (Exception e) {
-            isUpdate = false;
-            e.printStackTrace();
+
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setBoolean(1, isAvailable);
+                stmt.setString(2, userName);
+
+                stmt.executeUpdate();
+
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
         }
-        
-        return isUpdate;
     }
-    
-    private boolean updateToken(String userName, String token){
-        boolean isUpdate = true;
+
+    private boolean setToken(String userName, String token) {
         String query = "UPDATE users set token = ? WHERE user_name = ?";
-        
+
         try {
             Connection connection = Database.getInstance().getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            
-            preparedStatement.setString(1, token);
-            preparedStatement.setString(2, userName);
-            
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-        } catch (Exception e) {
-            isUpdate = false;
-            e.printStackTrace();
+
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, token);
+                stmt.setString(2, userName);
+
+                stmt.executeUpdate();
+
+                return true;
+            }
+        } catch (SQLException e) {
+            return false;
         }
-        
-        return isUpdate;
     }
-    
+
     @Override
     public LoginResult login(UserDTO user) {
-        LoginResult loginResult = LoginResult.DB_ERROR;
         String query = "SELECT * FROM users WHERE user_name = ? AND password_hash = ?";
         try {
-           Connection connection = Database.getInstance().getConnection(); 
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            
-            preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(2, user.getPasswordHash());
-            
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                if(resultSet.getBoolean("is_online")){
-                    loginResult = LoginResult.ALREADY_LOGGED_IN;
-                } else{
-                    loginResult = LoginResult.LOGGED_IN_SUCCESSFULLY;
-                    updateOnlineStatus(user.getUsername(), true);
-                    updateAvailableStatus(user.getUsername(), true);
-                    updateToken(user.getUsername(), user.getToken());
+            Connection connection = Database.getInstance().getConnection();
+
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, user.getUsername());
+                stmt.setString(2, user.getPasswordHash());
+
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    if (resultSet.next()) {
+                        if (resultSet.getBoolean("is_online")) {
+                            return LoginResult.ALREADY_LOGGED_IN;
+                        } else {
+                            setOnlineStatus(user.getUsername(), true);
+                            setAvailableStatus(user.getUsername(), true);
+                            setToken(user.getUsername(), user.getToken());
+
+                            return LoginResult.LOGGED_IN_SUCCESSFULLY;
+                        }
+                    } else {
+                        System.out.println("Wrong UserName or Password");
+                        return LoginResult.WRONG_USERNAME_OR_PASSWORD;
+                    }
                 }
-            } else {
-                loginResult = LoginResult.WRONG_USERNAME_OR_PASSWORD;
-                System.out.println("Wrong UserName or Password");
             }
-            
-            preparedStatement.close();
-            resultSet.close();
-        } catch (Exception e) {
-            loginResult = LoginResult.DB_ERROR;
-            System.out.println("Error DB");
+        } catch (SQLException e) {
             e.printStackTrace();
+            return LoginResult.DB_ERROR;
         }
-        
-        return loginResult;
     }
-    
+
     @Override
     public boolean logOut(String userName) {
-        updateToken(userName, null);
-        updateAvailableStatus(userName, false);
-        return updateOnlineStatus(userName, false);
-        
+        setToken(userName, null);
+        setAvailableStatus(userName, false);
+        return setOnlineStatus(userName, false);
+
     }
-    
+
     @Override
     public String loginWithToken(String token) {
         String userName = null;
-        
+
         String query = "SELECT * FROM users WHERE token = ?";
-        
+
         try {
             Connection connection = Database.getInstance().getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            
+
             preparedStatement.setString(1, token);
-            
+
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 userName = resultSet.getString("user_name");
-                updateOnlineStatus(userName, true);
-                updateAvailableStatus(userName, true);
+                setOnlineStatus(userName, true);
+                setAvailableStatus(userName, true);
             } else {
                 System.out.println("EXPIRED OR WRONG TOKEN");
             }
-            
+
             preparedStatement.close();
             resultSet.close();
         } catch (Exception e) {
             System.out.println("Error DB");
             e.printStackTrace();
         }
-        
+
         return userName;
     }
 }
