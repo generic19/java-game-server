@@ -1,6 +1,7 @@
 package com.mycompany.javagameserver;
 
 import com.mycompany.javagameserver.handling.*;
+import com.mycompany.javagameserver.services.ClientService;
 import com.mycompany.networking.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -47,6 +48,7 @@ public class CommunicatorClient implements Client {
         
         thread = new Thread(() -> {
             try {
+                ClientService.getService().addClient(this);
                 while (true) {
                     
                     try {
@@ -62,6 +64,7 @@ public class CommunicatorClient implements Client {
                     }
                 }
             } catch (IOException ex) {
+                ClientService.getService().removeClient(this);
                 System.out.println("Client socket closed.");
             }
         });
