@@ -12,9 +12,9 @@ import com.mycompany.networking.OnlinePlayer;
  * @author ArwaKhaled
  */
 public class GameStartMessage implements GameMessage {
-    private OnlinePlayer player;
-    private OnlinePlayer opponent;
-    private Player playerTurn;
+    private final OnlinePlayer player;
+    private final OnlinePlayer opponent;
+    private final Player playerTurn;
 
     public GameStartMessage(OnlinePlayer player, OnlinePlayer opponent, Player playerTurn) {
         this.player = player;

@@ -38,9 +38,13 @@ public class MatchingUpdateMessage implements MatchingMessage {
         return target;
     }
 
+   
     public MatchingUpdateMessage(OnlinePlayer player, UpdateType updateType, Target target) {
         this.player = player;
         this.updateType = updateType;
         this.target = target;
     }
+
+    
+
 }

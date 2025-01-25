@@ -9,7 +9,6 @@ package com.mycompany.networking.authentication;
  * @author ayasa
  */
 public class RegisterRespose implements AuthMessage {
-    
     private boolean success;
     private String token;
     private String errorMessage;
