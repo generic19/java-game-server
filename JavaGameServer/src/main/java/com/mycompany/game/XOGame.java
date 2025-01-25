@@ -6,6 +6,7 @@ package com.mycompany.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -15,7 +16,7 @@ public class XOGame implements Game<XOGameMove, XOGameState> {
 
     private XOGameState currentState;
     private GameAgent[] gameAgents = new GameAgent[2];
-    private final List<Game.Listener<XOGameMove, XOGameState>> listeners = new ArrayList<>();
+    private final List<Game.Listener<XOGameMove, XOGameState>> listeners = new CopyOnWriteArrayList<>();
 
     public XOGame() {
         this.currentState = new XOGameState();

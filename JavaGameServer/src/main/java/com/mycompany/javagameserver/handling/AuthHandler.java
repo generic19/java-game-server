@@ -6,7 +6,6 @@ import static com.mycompany.database.RegisterResult.ALREADY_REGISTERD;
 import static com.mycompany.database.RegisterResult.DB_ERROR;
 import static com.mycompany.database.RegisterResult.REGISTERD_SUCCESSFULLY;
 import com.mycompany.database.UserDAO;
-import com.mycompany.database.UserDAOImpl;
 import com.mycompany.database.UserDTO;
 import com.mycompany.database.UserDTOImpl;
 import com.mycompany.javagameserver.Client;

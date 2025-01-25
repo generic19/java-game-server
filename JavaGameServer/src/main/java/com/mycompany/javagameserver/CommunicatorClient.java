@@ -86,8 +86,8 @@ public class CommunicatorClient implements Client {
     private String getClientRepresentation() {
         if (authHandler != null && authHandler.getUsername() != null) {
             return "username=" + authHandler.getUsername();
-        } else if (socket != null && socket.getLocalPort() != -1) {
-            return "port=" + socket.getLocalPort();
+        } else if (socket != null && socket.getPort() != 0) {
+            return "port=" + socket.getPort();
         } else {
             return "disconnected client";
         }
