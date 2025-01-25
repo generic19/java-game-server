@@ -15,14 +15,15 @@ import java.util.logging.Logger;
  * @author basel
  */
 public class CommunicatorClient implements Client {
-    
+
     private final Socket socket;
     ObjectInputStream inputStream;
     ObjectOutputStream outputStream;
     Thread thread;
+    AuthHandler authHandler;
     MatchingHandler matchingHandler;
     GameHandler gameHandler;
-    
+
     public CommunicatorClient(Socket socket) {
         this.socket = socket;
         try {
@@ -33,11 +34,11 @@ public class CommunicatorClient implements Client {
             System.out.println("TODO : release all players resources");
         }
     }
-    
+
     @Override
     public void start() {
         // AuthHandler  -->  MatchingHandler  -->  GameHandler
-        Handler authHandler = new AuthHandler();
+        authHandler = new AuthHandler();
         matchingHandler = new MatchingHandler();
         gameHandler = new GameHandler();
         authHandler.bind(this);
@@ -45,22 +46,24 @@ public class CommunicatorClient implements Client {
         gameHandler.bind(this);
         authHandler.setNext(matchingHandler);
         matchingHandler.setNext(gameHandler);
-        
+
         thread = new Thread(() -> {
             try {
                 ClientService.getService().addClient(this);
                 while (true) {
-                    
+
                     try {
                         Object obj = inputStream.readObject();
                         
+                        System.out.println("received from " + getClientRepresentation() + " " + obj + ".");
+
                         Message msg = (Message) obj;
-                        
+
                         Request request = new Request(msg);
-                        
+
                         authHandler.handle(request);
                     } catch (ClassNotFoundException ex) {
-                        System.err.println("Error reading message from socket.");
+                        System.err.println("error reading message from socket.");
                     }
                 }
             } catch (IOException ex) {
@@ -70,7 +73,7 @@ public class CommunicatorClient implements Client {
         });
         thread.start();
     }
-    
+
     @Override
     public void stop() {
         try {
@@ -79,21 +82,35 @@ public class CommunicatorClient implements Client {
             System.err.println("Could not close socket.");
         }
     }
-    
+
+    private String getClientRepresentation() {
+        if (authHandler != null && authHandler.getUsername() != null) {
+            return "username=" + authHandler.getUsername();
+        } else if (socket != null && socket.getLocalPort() != -1) {
+            return "port=" + socket.getLocalPort();
+        } else {
+            return "disconnected client";
+        }
+    }
+
     @Override
     public void sendMessage(Message message) {
         try {
+            System.out.println("sending to " + getClientRepresentation() + " " + message + "..");
+            
             outputStream.writeObject(message);
+            
+            System.out.println("sent.");
         } catch (IOException ex) {
-            // to be handled
+            System.err.print("could not send message to " + getClientRepresentation() + ".");
         }
     }
-    
+
     @Override
     public MatchingHandler getMatchingHandler() {
         return matchingHandler;
     }
-    
+
     @Override
     public GameHandler getGameHandler() {
         return gameHandler;

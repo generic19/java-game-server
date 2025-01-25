@@ -162,6 +162,10 @@ public class AuthHandler implements Handler {
     public void setNext(Handler handler) {
         this.handler = handler;
     }
+
+    public String getUsername() {
+        return username;
+    }
     
     private String getHashedPassword(String password){
         

@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.javagameserver.handling;
+
 import com.mycompany.database.OnlinePlayerDTO;
 import com.mycompany.database.PlayerDAO;
 import com.mycompany.game.Game;
@@ -20,63 +21,69 @@ import com.mycompany.networking.matching.MatchingSubscriptionRequest;
 import com.mycompany.networking.matching.MatchingUpdateMessage;
 import java.util.List;
 
-
-
-
 /**
  *
  * @author ArwaKhaled
  */
 public class MatchingHandler implements Handler, PlayerDAO.Listener {
-    
-     OnlinePlayer   player;
-     OnlinePlayer opponent = null;
-     AuthenticatedRequest authRequest ;
-     Client client ;
-     Handler next;
-     
+
+    OnlinePlayer player;
+    OnlinePlayer opponent = null;
+    AuthenticatedRequest authRequest;
+    Client client;
+    Handler next;
+
     @Override
     public void handle(Request request) {
-         if(request.getMessage() instanceof  MatchingMessage){
+        if (request.getMessage() instanceof MatchingMessage) {
             this.authRequest = (AuthenticatedRequest) request;
-            if(request.getMessage() instanceof MatchingSubscriptionRequest){
-                player=getOnlinePlayer(authRequest.getUserName());
-               MatchingSubscriptionRequest msg  = (MatchingSubscriptionRequest)request.getMessage();
-               if(msg.isSubscribe()){
-                   ClientService.getService().setIsInGame(client,false);
-                   List<OnlinePlayer> availablePlayers=  ClientService.getService().getAvailable( );
-                   List<OnlinePlayer> inGamePlayers=  ClientService.getService().getInGame();
-                   MatchingInitialStateMessage message= new MatchingInitialStateMessage(availablePlayers, inGamePlayers);
-                   client.sendMessage(message);
-                   PlayerDAO.getInstance().addListener(this);
-                  
-                }else {
+
+            if (request.getMessage() instanceof MatchingSubscriptionRequest) {
+                player = getOnlinePlayer(authRequest.getUserName());
+
+                MatchingSubscriptionRequest msg = (MatchingSubscriptionRequest) request.getMessage();
+
+                if (msg.isSubscribe()) {
+                    ClientService.getService().setIsInGame(client, false);
+
+                    List<OnlinePlayer> availablePlayers = ClientService.getService().getAvailable();
+                    List<OnlinePlayer> inGamePlayers = ClientService.getService().getInGame();
+
+                    MatchingInitialStateMessage message = new MatchingInitialStateMessage(availablePlayers,
+                        inGamePlayers);
+
+                    client.sendMessage(message);
+
+                    PlayerDAO.getInstance().addListener(this);
+                } else {
                     PlayerDAO.getInstance().removeListener(this);
-               }
-            } else if(request.getMessage() instanceof InviteRequest){
-                InviteRequest msg= (InviteRequest)request.getMessage();
+                }
+            } else if (request.getMessage() instanceof InviteRequest) {
+                InviteRequest msg = (InviteRequest) request.getMessage();
                 opponent = getOnlinePlayer(msg.getUserName());
-                
-                Client opponentClient=  ClientService.getService().getClientByUsername(msg.getUserName());
+
+                Client opponentClient = ClientService.getService().getClientByUsername(msg.getUserName());
+
                 opponentClient.getMatchingHandler().setOpponent(player);
                 opponentClient.sendMessage(new IncomingInviteRequest(authRequest.getUserName()));
-            }else if(request.getMessage() instanceof IncomingInviteRespose ){
-                IncomingInviteRespose msg = (IncomingInviteRespose)request.getMessage();
-                String opponentUserName=  client.getMatchingHandler().getOpponent().getUsername();
+            } else if (request.getMessage() instanceof IncomingInviteRespose) {
+                IncomingInviteRespose msg = (IncomingInviteRespose) request.getMessage();
+
+                String opponentUserName = client.getMatchingHandler().getOpponent().getUsername();
                 Client opponentClient = ClientService.getService().getClientByUsername(opponentUserName);
+
                 opponentClient.sendMessage((new IncomingInviteRespose(msg.getResponse())));
-                   if(msg.getResponse()==IncomingInviteRespose.Response.ACCEPTED){
-                   Game game= new XOGame();
-                   client.getGameHandler().startGame(game, player, opponent, Player.one);
-                   opponentClient.getGameHandler().startGame(game, opponent, player, Player.two);
-                   
-                   }
-            }else if(opponent!=null){
-                next.handle(request);
-                
-            
-       }
-    }
+
+                if (msg.getResponse() == IncomingInviteRespose.Response.ACCEPTED) {
+                    Game game = new XOGame();
+
+                    client.getGameHandler().startGame(game, player, opponent, Player.one);
+                    opponentClient.getGameHandler().startGame(game, opponent, player, Player.two);
+                }
+            }
+        } else if (opponent != null) {
+            next.handle(request);
+        }
     }
 
     public OnlinePlayer getOpponent() {
@@ -86,32 +93,31 @@ public class MatchingHandler implements Handler, PlayerDAO.Listener {
     public void setOpponent(OnlinePlayer opponent) {
         this.opponent = opponent;
     }
-    
+
     @Override
     public void setNext(Handler handler) {
-       next=handler;
+        next = handler;
     }
-      OnlinePlayer getOnlinePlayer(String userName){
-        OnlinePlayerDTO onlinePlayerDTO =  PlayerDAO.getInstance().getOnlinePlayer(userName) ;
-       return onlinePlayerDTO.getPlayer();
+
+    OnlinePlayer getOnlinePlayer(String userName) {
+        OnlinePlayerDTO onlinePlayerDTO = PlayerDAO.getInstance().getOnlinePlayer(userName);
+        return onlinePlayerDTO.getPlayer();
     }
 
     @Override
     public void onPlayerUpdate(String username, boolean isAdd, boolean isRemove, boolean isAvailable, boolean isInGame) {
-        
-        MatchingUpdateMessage.UpdateType updateType= isAdd?
-        MatchingUpdateMessage.UpdateType.ADD:MatchingUpdateMessage.UpdateType.REMOVE;
-        MatchingUpdateMessage.Target target =  isAvailable? 
-        MatchingUpdateMessage.Target.AVAILABLE:MatchingUpdateMessage.Target.IN_GAME;
-        MatchingUpdateMessage msg = new MatchingUpdateMessage(getOnlinePlayer(username),updateType,target);
+
+        MatchingUpdateMessage.UpdateType updateType = isAdd ? MatchingUpdateMessage.UpdateType.ADD
+            : MatchingUpdateMessage.UpdateType.REMOVE;
+        MatchingUpdateMessage.Target target = isAvailable ? MatchingUpdateMessage.Target.AVAILABLE
+            : MatchingUpdateMessage.Target.IN_GAME;
+        MatchingUpdateMessage msg = new MatchingUpdateMessage(getOnlinePlayer(username), updateType, target);
         client.sendMessage(msg);
     }
 
     @Override
     public void bind(Client client) {
-        this.client=client;
+        this.client = client;
     }
-    
-    
-}
 
+}

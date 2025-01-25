@@ -5,8 +5,6 @@ import com.mycompany.javagameserver.Client;
 import com.mycompany.networking.OnlinePlayer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +45,6 @@ public class ClientService {
         
         if (username != null) {
             PlayerDAO.getInstance().setPlayerOnline(username, false);
-            PlayerDAO.getInstance().setPlayerAvailable(username, false);
         }
     }
     
