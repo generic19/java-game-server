@@ -114,10 +114,16 @@ public class DashboardController implements Initializable, Server.Listener {
         lblOnlinePlayersCount.setText("" + onlineCount);
         lblOfflinePlayersCount.setText("" + offlineCount);
 
-        double activeFraction = inGameCount / (double) playerCount;
-        double onlineFraction = onlineCount / (double) playerCount;
-        double offlineFraction = offlineCount / (double) playerCount;
+        double activeFraction = 0;
+        double onlineFraction = 0;
+        double offlineFraction = 0;
 
+        if (playerCount != 0) {
+            activeFraction = inGameCount / (double) playerCount;
+            onlineFraction = onlineCount / (double) playerCount;
+            offlineFraction = offlineCount / (double) playerCount;
+        }
+        
         drawIndicator(activePlayersCanvas, activeFraction);
         drawIndicator(onlinePlayersCanvas, onlineFraction);
         drawIndicator(offlinePlayersCanvas, offlineFraction);
@@ -126,14 +132,13 @@ public class DashboardController implements Initializable, Server.Listener {
     private void drawIndicator(Canvas canvas, double fraction) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        gc.setFill(Color.WHITE);
-        gc.fill();
+        gc.clearRect(0, 0, 150, 150);
 
         gc.setStroke(Color.web("00A4E9"));
         gc.setLineCap(StrokeLineCap.BUTT);
         gc.setLineWidth(5);
 
-        gc.strokeArc(5, 5, 140, 140, 0, 360 * fraction, ArcType.OPEN);
+        gc.strokeArc(5, 5, 140, 140, 90, -359.99 * fraction, ArcType.OPEN);
     }
 
     @Override
