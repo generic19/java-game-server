@@ -4,14 +4,15 @@
  */
 package com.mycompany.networking.game;
 
+import com.mycompany.game.XOGameState;
+
 /**
  *
  * @author basel
  */
-public class GameLeaveMessage implements GameMessage {
-
-    @Override
-    public String toString() {
-        return "GameLeaveMessage{" + '}';
+public class XOGameStateMessage extends GameStateMessage<XOGameState>{
+    
+    public XOGameStateMessage(XOGameState state) {
+        super(state);
     }
 }
