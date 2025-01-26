@@ -96,12 +96,6 @@ public class GameHandler implements Handler, Game.Listener {
         
         this.game.removeListener(this);
         listener.onClientEndedGame(client);
-        
-        this.game = null;
-        this.player = null;
-        this.opponent = null;
-        this.playerTurn = null;
-        this.opponentClient = null;
     }
     
     @Override
@@ -114,7 +108,10 @@ public class GameHandler implements Handler, Game.Listener {
             boolean isWinner = winnerPlayer == playerTurn;
             boolean isLoser = winnerPlayer != null && winnerPlayer != playerTurn;
             
-            endGame(isWinner, isLoser);
+            this.endGame(isWinner, isLoser);
+            
+            opponentClient.sendMessage(new XOGameStateMessage((XOGameState) newState));
+            opponentClient.getGameHandler().endGame(isLoser, isWinner);
         }
     }
 
