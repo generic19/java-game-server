@@ -5,8 +5,8 @@
 package com.mycompany.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -16,7 +16,7 @@ public class XOGame implements Game<XOGameMove, XOGameState> {
 
     private XOGameState currentState;
     private GameAgent[] gameAgents = new GameAgent[2];
-    private final List<Game.Listener<XOGameMove, XOGameState>> listeners = new CopyOnWriteArrayList<>();
+    private final List<Game.Listener<XOGameMove, XOGameState>> listeners = Collections.synchronizedList(new ArrayList<>());
 
     public XOGame() {
         this.currentState = new XOGameState();
@@ -31,9 +31,11 @@ public class XOGame implements Game<XOGameMove, XOGameState> {
     public synchronized void play(XOGameMove move) throws IllegalStateException {
         if (currentState.isValidMove(move)) {
             currentState = currentState.play(move);
+            
             for (Game.Listener listener : listeners) {
                 listener.onStateChange(currentState);
             }
+            
             Player nextTurnPlayer = currentState.getNextTurnPlayer();
             GameAgent agent = gameAgents[nextTurnPlayer.ordinal()];
             if (agent != null && !currentState.isEndState()) {
@@ -70,5 +72,10 @@ public class XOGame implements Game<XOGameMove, XOGameState> {
         for (Game.Listener listener : listeners) {
             listener.onStateChange(currentState);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "XOGame{" + "currentState=" + currentState + ", listeners=" + listeners + '}';
     }
 }

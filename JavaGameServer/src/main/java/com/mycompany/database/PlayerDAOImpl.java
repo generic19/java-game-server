@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +21,6 @@ import java.util.logging.Logger;
 public class PlayerDAOImpl implements PlayerDAO {
 
     private static volatile PlayerDAO instance;
-    private final List<Listener> listeners = new CopyOnWriteArrayList<>();
 
     public static PlayerDAO getInstance() {
         if (instance == null) {
@@ -172,11 +170,6 @@ public class PlayerDAOImpl implements PlayerDAO {
             stmt.setString(2, username);
 
             stmt.executeUpdate();
-
-            listeners.forEach(l -> {
-                l.onPlayerUpdate(username, isAvailable, !isAvailable, isAvailable, !isAvailable);
-                l.onPlayerUpdate(username, !isAvailable, isAvailable, !isAvailable, isAvailable);
-            });
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -259,16 +252,6 @@ public class PlayerDAOImpl implements PlayerDAO {
     }
 
     @Override
-    public void addListener(Listener listener) {
-        listeners.add(listener);
-    }
-
-    @Override
-    public void removeListener(Listener listener) {
-        listeners.remove(listener);
-    }
-
-    @Override
     public int getOnlineCount() {
         final String query = "SELECT sum(is_online = true) as onlineCount FROM users";
 
@@ -289,4 +272,8 @@ public class PlayerDAOImpl implements PlayerDAO {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return "PlayerDAOImpl{}";
+    }
 }

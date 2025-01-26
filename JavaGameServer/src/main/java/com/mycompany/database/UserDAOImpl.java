@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 public class UserDAOImpl implements UserDAO {
 
-    private static UserDAOImpl instance;
+    private static volatile UserDAOImpl instance;
 
     public static UserDAOImpl getInstance() {
         if (instance == null) {

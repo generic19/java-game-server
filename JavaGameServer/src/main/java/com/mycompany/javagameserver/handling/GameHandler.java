@@ -19,6 +19,8 @@ import com.mycompany.networking.game.*;
  */
 public class GameHandler implements Handler, Game.Listener {
     
+    private ClientGameStatusListener listener;
+    
     private Client client;
     private Handler next;
     
@@ -28,9 +30,7 @@ public class GameHandler implements Handler, Game.Listener {
     private Player playerTurn;
     private Client opponentClient;
     
-    public GameHandler() {
-        
-    }
+    public GameHandler() {}
     
     @Override
     public void bind(Client client) {
@@ -74,6 +74,7 @@ public class GameHandler implements Handler, Game.Listener {
         
         this.opponentClient.getGameHandler().setOpponent(player);
         
+        listener.onClientStartedGame(client);
         this.game.addListener(this);
         
         client.sendMessage(new GameStartMessage(player, opponent, playerTurn));
@@ -94,6 +95,7 @@ public class GameHandler implements Handler, Game.Listener {
         client.sendMessage(new GameEndMessage(isWinner, isLoser, score));
         
         this.game.removeListener(this);
+        listener.onClientEndedGame(client);
         
         this.game = null;
         this.player = null;
@@ -115,4 +117,9 @@ public class GameHandler implements Handler, Game.Listener {
             endGame(isWinner, isLoser);
         }
     }
+
+    public void setListener(ClientGameStatusListener listener) {
+        this.listener = listener;
+    }
+    
 }

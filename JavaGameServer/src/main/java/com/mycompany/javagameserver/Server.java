@@ -11,34 +11,45 @@ import java.net.SocketException;
  * @author basel
  */
 public class Server {
-
-    private final int port;
-
+    public final int PORT = 5005;
+    
+    private static volatile Server instance;
+        
     private Thread thread;
     private ServerSocket serverSocket;
     private Listener listener;
-
-    public Server(int port) {
-        this.port = port;
+    
+    public static Server getInstance() {
+        if (instance == null) {
+            synchronized (Server.class) {
+                if (instance == null) {
+                    instance = new Server();
+                }
+            }
+        }
+        return instance;
     }
-
+    
+    private Server() {
+    }
+    
     public void setListener(Listener listener) {
         this.listener = listener;
     }
-
+    
     public void start() {
         thread = new Thread(() -> {
             try {
-                serverSocket = new ServerSocket(port);
-
+                serverSocket = new ServerSocket(PORT);
+                
                 if (listener != null) {
                     listener.onServerThreadStarted();
                 }
-
+                
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
                     CommunicatorClient client = new CommunicatorClient(clientSocket);
-
+                    
                     client.start();
                     ClientService.getService().addClient(client);
                 }
@@ -53,18 +64,18 @@ public class Server {
                     stop();
                 }
             }
-
+            
             if (listener != null) {
                 listener.onServerThreadStopping();
             }
         });
-
+        
         thread.start();
     }
-
+    
     public void stop() {
         ClientService.getService().getClients().forEach(client -> client.stop());
-
+        
         try {
             if (serverSocket != null) {
                 serverSocket.close();
@@ -72,19 +83,19 @@ public class Server {
         } catch (IOException ex) {
             System.err.println("Error closing server socket.");
         }
-
+        
         thread = null;
         serverSocket = null;
     }
-
+    
     public boolean isRunning() {
         return thread != null && thread.isAlive() && serverSocket != null && !serverSocket.isClosed();
     }
-
+    
     public interface Listener {
-
+        
         void onServerThreadStarted();
-
+        
         void onServerThreadStopping();
     }
 }

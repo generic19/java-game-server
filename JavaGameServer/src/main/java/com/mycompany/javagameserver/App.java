@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.SQLException;
+import javafx.application.Platform;
 
 /**
  * JavaFX App
@@ -18,6 +19,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        stage.setOnHidden((e) -> {
+            Platform.exit();
+        });
+        
         scene = new Scene(loadFXML("dashboard"));
         stage.setScene(scene);
         stage.show();

@@ -29,10 +29,12 @@ import java.util.UUID;
  * @author AhmedAli
  */
 public class AuthHandler implements Handler {
-    
+
     private Client client;
     private Handler handler;
     private String username;
+
+    private ClientAuthListener listener;
 
     @Override
     public void bind(Client client) {
@@ -41,8 +43,23 @@ public class AuthHandler implements Handler {
 
     @Override
     public void handle(Request request) {
-        if (request.getMessage() instanceof RegisterRequest) {
-            /*
+        Message message = request.getMessage();
+        
+        if (message instanceof RegisterRequest) {
+            handleRegister((RegisterRequest) message);
+        } else if (message instanceof SignInRequest) {
+            handleSignIn((SignInRequest) message);
+        } else if (message instanceof SignInWithTokenRequest) {
+            handleSignInWithToken((SignInWithTokenRequest) message);
+        } else if (message instanceof SignOutRequest) {
+            handleSignOut();
+        } else if (username != null) {
+            handler.handle(new AuthenticatedRequest(username, message));
+        }
+    }
+
+    private void handleRegister(RegisterRequest registerRequest) throws IllegalStateException {
+        /*
             1. casting massege to registerRequest
             2. extract userName , password from registerRequest
             3. creating object from UserDto and give it userName , password
@@ -50,110 +67,107 @@ public class AuthHandler implements Handler {
             5. calling Register
             6. creating Response based on result of register
             7. sendMessage using client
-             */
-            RegisterRequest registerRequest = (RegisterRequest) request.getMessage();
-            
-            // Hash the Password
-            String hashedPassword = getHashedPassword(registerRequest.getPassword());
-            // generate token
-            String generateToken = generateToken();
-            
-            UserDTO user = new UserDTOImpl(registerRequest.getUsername(), hashedPassword, generateToken);
-            RegisterResult result = UserDAO.getInstance().register(user);
-            
-            Message message;
-            switch (result) {
-                case DB_ERROR:
-                    message = new RegisterRespose(false, null, "Something went wrong");
-                    username = null;
-                    break;
-                case ALREADY_REGISTERD:
-                    message = new RegisterRespose(false, null, "Already Registered. Login instead.");
-                    username = null;
-                    break;
-                case REGISTERD_SUCCESSFULLY:
-                    message = new RegisterRespose(true, generateToken, null);
-                    username = registerRequest.getUsername();
-                    ClientService.getService().setUsername(client, registerRequest.getUsername());
-                    break;
-                default:
-                    System.out.println("Unknown Error");
-                    username = null;
-                    message = new RegisterRespose(false, null, "Unknown Error");
-                    break;
-            }
-            
-            client.sendMessage(message);
-        } else if (request.getMessage() instanceof SignInRequest) {
-            
-            SignInRequest signInRequest = (SignInRequest) request.getMessage();
-            
-            String hashedPassword = getHashedPassword(signInRequest.getPassword());
-            
-            String generateToken = generateToken();
-            
-            UserDTO user = new UserDTOImpl(signInRequest.getUserName(), hashedPassword, generateToken);
-            LoginResult result = UserDAO.getInstance().login(user);
-            
-            Message message;
-            switch (result) {
-                case DB_ERROR:
-                    message = new SignInResponse(false, null, "Something went wrong");
-                    username = null;
-                    break;
-                case WRONG_USERNAME_OR_PASSWORD:
-                    message = new SignInResponse(false, null, "WRONG USERNAME OR PASSWORD.");
-                    username = null;
-                    break;
-                case ALREADY_LOGGED_IN:
-                    message = new SignInResponse(false, null, "ALREADY LOGGED IN.");
-                    username = null;
-                    break;
-                case LOGGED_IN_SUCCESSFULLY:
-                    message = new SignInResponse(true, generateToken, null);
-                    username = signInRequest.getUserName();
-                    ClientService.getService().setUsername(client, signInRequest.getUserName());
-                    break;
-                default:
-                    System.out.println("Unknown Error");
-                    username = null;
-                    message = new SignInResponse(false, null, "Unknown Error");
-                    break;
-            }
-            
-            client.sendMessage(message);
-        } else if (request.getMessage() instanceof SignInWithTokenRequest) {
-            
-            Message message;
-            SignInWithTokenRequest signInWithTokenRequest = (SignInWithTokenRequest) request.getMessage();
-            
-            username = UserDAO.getInstance().loginWithToken(signInWithTokenRequest.getToken());
-            
-            if(username == null){
-                message = new SignInWithTokenResponse(false);
-            } else if (ClientService.getService().getClientByUsername(username)!=null&&ClientService.getService().getClientByUsername(username)!=client){
-                 message = new SignInWithTokenResponse(false);
-                 System.out.println("Login attempt denied. User " + username + " is already logged in.");
-            }
-            else {
+         */
+
+        // Hash the Password
+        String hashedPassword = getHashedPassword(registerRequest.getPassword());
+        // generate token
+        String generateToken = generateToken();
+
+        UserDTO user = new UserDTOImpl(registerRequest.getUsername(), hashedPassword, generateToken);
+        RegisterResult result = UserDAO.getInstance().register(user);
+
+        Message message;
+        
+        switch (result) {
+            case REGISTERD_SUCCESSFULLY:
+                message = new RegisterRespose(true, generateToken, null);
+                username = registerRequest.getUsername();
+                listener.onClientSignedIn(client);
+                break;
+            case DB_ERROR:
+                message = new RegisterRespose(false, null, "Something went wrong");
+                username = null;
+                break;
+            case ALREADY_REGISTERD:
+                message = new RegisterRespose(false, null, "Already Registered. Login instead.");
+                username = null;
+                break;
+            default:
+                System.out.println("Unknown Error");
+                username = null;
+                message = new RegisterRespose(false, null, "Unknown Error");
+                break;
+        }
+
+        client.sendMessage(message);
+    }
+
+    private void handleSignIn(SignInRequest signInRequest) {
+        String hashedPassword = getHashedPassword(signInRequest.getPassword());
+
+        String generateToken = generateToken();
+
+        UserDTO user = new UserDTOImpl(signInRequest.getUserName(), hashedPassword, generateToken);
+        LoginResult result = UserDAO.getInstance().login(user);
+
+        Message message;
+        switch (result) {
+            case LOGGED_IN_SUCCESSFULLY:
+                message = new SignInResponse(true, generateToken, null);
+                username = signInRequest.getUserName();
+                listener.onClientSignedIn(client);
+                break;
                 
-                message = new SignInWithTokenResponse(true);
-                ClientService.getService().setUsername(client, username);
+            case DB_ERROR:
+                message = new SignInResponse(false, null, "Something went wrong");
+                username = null;
+                break;
+
+            case WRONG_USERNAME_OR_PASSWORD:
+                message = new SignInResponse(false, null, "WRONG USERNAME OR PASSWORD.");
+                username = null;
+                break;
+
+            case ALREADY_LOGGED_IN:
+                message = new SignInResponse(false, null, "ALREADY LOGGED IN.");
+                username = null;
+                break;
+
+            default:
+                System.out.println("Unknown Error");
+                username = null;
+                message = new SignInResponse(false, null, "Unknown Error");
+                break;
+        }
+
+        client.sendMessage(message);
+    }
+
+    private void handleSignInWithToken(SignInWithTokenRequest signInWithTokenRequest) throws IllegalStateException {
+        username = UserDAO.getInstance().loginWithToken(signInWithTokenRequest.getToken());
+
+        if (username == null) {
+            client.sendMessage(new SignInWithTokenResponse(false));
+        } else {
+            Client usernameClient = ClientService.getService().getClientByUsername(username);
+
+            if (usernameClient != null && usernameClient != client) {
+                client.sendMessage(new SignInWithTokenResponse(false));
+            } else {
+                client.sendMessage(new SignInWithTokenResponse(true));
+                listener.onClientSignedIn(client);
             }
-            
-            client.sendMessage(message);
-        } else if (request.getMessage() instanceof SignOutRequest) {            
-            if (username != null) {
-                boolean result = UserDAO.getInstance().logOut(username);
-                
-                Message message = new SignOutRespons(result);
-                
-                client.sendMessage(message);
-                
-                ClientService.getService().setUsername(client, null);
-            }
-        } else if (username != null) {
-            handler.handle(new AuthenticatedRequest(username, request.getMessage()));
+        }
+    }
+
+    private void handleSignOut() throws IllegalStateException {
+        if (username != null) {
+            UserDAO.getInstance().logOut(username);
+
+            listener.onClientWillSignOut(client);
+            username = null;
+            client.sendMessage(new SignOutRespons(true));
         }
     }
 
@@ -165,9 +179,9 @@ public class AuthHandler implements Handler {
     public String getUsername() {
         return username;
     }
-    
-    private String getHashedPassword(String password){
-        
+
+    private String getHashedPassword(String password) {
+
         String hashPassword;
         try {
             // get password Hashed
@@ -178,7 +192,7 @@ public class AuthHandler implements Handler {
         }
         return hashPassword;
     }
-    
+
     private String hashPasswordBase64(String password) throws NoSuchAlgorithmException {
         // Create a MessageDigest instance for SHA-256
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -189,8 +203,17 @@ public class AuthHandler implements Handler {
         // Return the base64-encoded version of the hashed bytes
         return Base64.getEncoder().encodeToString(hashedBytes);
     }
-    
-    private String generateToken(){
+
+    private String generateToken() {
         return UUID.randomUUID().toString();
+    }
+
+    @Override
+    public String toString() {
+        return "AuthHandler{username=" + username + '}';
+    }
+
+    public void setListener(ClientAuthListener Listener) {
+        this.listener = Listener;
     }
 }
